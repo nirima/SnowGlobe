@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.nirima.snowglobe</groupId>
+    <artifactId>snowglobe-core</artifactId>
+  
+    <parent>
+      <groupId>com.nirima</groupId>
+        <artifactId>snowglobe</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+ 
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenVersion}</version>
+                <executions>
+                <execution>
+                    <goals>
+                        <goal>addSources</goal>
+                        <goal>addTestSources</goal>
+                        <!--<goal>generateStubs</goal>-->
+                        <goal>compile</goal>
+                        <!--<goal>testGenerateStubs</goal>-->
+                        <goal>testCompile</goal>
+                        <!--<goal>removeStubs</goal>-->
+                        <!--<goal>removeTestStubs</goal>-->
+                    </goals>
+                </execution>
+                </executions>
+            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.gmaven</groupId>-->
+                <!--<artifactId>gmaven-plugin</artifactId>-->
+                <!--<version>${gmavenVersion}</version>-->
+
+                <!--<configuration>-->
+                    <!--&lt;!&ndash;<source>src/main/groovy</source>&ndash;&gt;-->
+                    <!--<providerSelection>${gmavenProviderSelection}</providerSelection>-->
+                    <!--<sourceEncoding>UTF-8</sourceEncoding>-->
+                    <!--<source/>-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>generateStubs</goal>-->
+                            <!--<goal>compile</goal>-->
+                            <!--<goal>generateTestStubs</goal>-->
+                            <!--<goal>testCompile</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<dependencies>-->
+                    <!--<dependency>-->
+                        <!--<groupId>org.codehaus.groovy</groupId>-->
+                        <!--<artifactId>groovy-all</artifactId>-->
+                        <!--<version>${groovyVersion}</version>-->
+                    <!--</dependency>-->
+                <!--</dependencies>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <!-- any version of Groovy \>= 1.5.0 should work here -->
+            <version>2.4.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+            <version>3.0.6-jenkins</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.thoughtworks.xstream</groupId>-->
+            <!--<artifactId>xstream</artifactId>-->
+            <!--<version>1.4.9</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>com.orbitz.consul</groupId>
+            <artifactId>consul-client</artifactId>
+            <version>0.12.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-core</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.1.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>bintray</name>
+            <url>http://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
+
+</project>

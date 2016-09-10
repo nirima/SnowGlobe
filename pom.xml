@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.nirima</groupId>
+    <artifactId>snowglobe</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1-SNAPSHOT</version>
+    
+    <properties>
+        <gmavenVersion>1.5</gmavenVersion>
+        <gmavenProviderSelection>2.0</gmavenProviderSelection>
+        <groovyVersion>2.4.7</groovyVersion>
+    </properties>
+
+ <build>
+        <plugins>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <fork>true</fork>
+                    <!--<compilerArgument>-parameters</compilerArgument>-->
+
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+   <modules>
+     <module>snowglobe-core</module>
+     <module>snowglobe-exe</module>
+     <module>snowglobe-shaded</module>
+     <module>snowglobe-jenkins-plugin</module>
+   </modules>
+
+</project>

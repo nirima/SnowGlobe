@@ -1,0 +1,45 @@
+package com.nirima
+
+snowglobe
+{
+    module("base") {
+        docker_provider {
+            //host = "tcp://localhost:2376"
+            host = "unix:///var/run/docker.sock"
+        }
+
+        docker_container("consul") {
+            image = "${docker_image("consul").name}"
+            name = "consul"
+            restart = "always"
+
+            ports {
+                internal = 8300
+                external = 8300
+            }
+
+            ports {
+                internal = 8301
+                external = 8301
+            }
+
+            ports {
+                internal = 8302
+                external = 8302
+            }
+
+            ports {
+                internal = 8500
+                external = 8500
+            }
+
+            command = ["agent", "-dev", "-client", "0.0.0.0"]
+        }
+
+        docker_image("consul")
+        {
+            name = "consul:v0.6.4"
+        }
+
+    }
+}

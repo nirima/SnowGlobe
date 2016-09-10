@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.nirima.snowglobe</groupId>
+    <artifactId>snowglobe-exe</artifactId>
+  
+    <parent>
+      <groupId>com.nirima</groupId>
+        <artifactId>snowglobe</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+    <build>
+    <plugins>
+
+        <!-- Make this jar executable -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>com.nirima.snowglobe.SnowGlobeApp</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+        </plugin>
+
+        <plugin>
+            <groupId>org.dstovall</groupId>
+            <artifactId>onejar-maven-plugin</artifactId>
+            <version>1.4.4</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>one-jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+
+    </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nirima.snowglobe</groupId>
+            <artifactId>snowglobe-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>2.0.31</version>
+        </dependency>
+    </dependencies>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>onejar-maven-plugin.googlecode.com</id>
+            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>
