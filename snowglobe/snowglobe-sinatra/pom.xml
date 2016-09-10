@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.nirima.snowglobe</groupId>
+    <artifactId>snowglobe-sinatra</artifactId>
+
+    <parent>
+        <groupId>com.nirima</groupId>
+        <artifactId>snowglobe</artifactId>
+        <version>0.0.1</version>
+    </parent>
+
+
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenVersion}</version>
+                <executions>
+                    <execution>
+                        <!--<goals>-->
+                            <!--<goal>addSources</goal>-->
+                            <!--<goal>addTestSources</goal>-->
+                            <!--&lt;!&ndash;<goal>generateStubs</goal>&ndash;&gt;-->
+                            <!--<goal>compile</goal>-->
+                            <!--&lt;!&ndash;<goal>testGenerateStubs</goal>&ndash;&gt;-->
+                            <!--<goal>testCompile</goal>-->
+                            <!--&lt;!&ndash;<goal>removeStubs</goal>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<goal>removeTestStubs</goal>&ndash;&gt;-->
+                        <!--</goals>-->
+                        <goals>
+                            <goal>addSources</goal>
+                            <goal>addTestSources</goal>
+                            <goal>generateStubs</goal>
+                            <goal>compile</goal>
+                            <!--<goal>generateTestStubs</goal>-->
+                            <!--<goal>compileTests</goal>-->
+                            <!--<goal>removeStubs</goal>-->
+                            <!--<goal>removeTestStubs</goal>-->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.codehaus.gmaven</groupId>-->
+            <!--<artifactId>gmaven-plugin</artifactId>-->
+            <!--<version>${gmavenVersion}</version>-->
+
+            <!--<configuration>-->
+            <!--&lt;!&ndash;<source>src/main/groovy</source>&ndash;&gt;-->
+            <!--<providerSelection>${gmavenProviderSelection}</providerSelection>-->
+            <!--<sourceEncoding>UTF-8</sourceEncoding>-->
+            <!--<source />-->
+            <!--</configuration>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>generateStubs</goal>-->
+            <!--<goal>compile</goal>-->
+            <!--<goal>generateTestStubs</goal>-->
+            <!--<goal>testCompile</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--<dependencies>-->
+            <!--<dependency>-->
+            <!--<groupId>org.codehaus.groovy</groupId>-->
+            <!--<artifactId>groovy-all</artifactId>-->
+            <!--<version>${groovyVersion}</version>-->
+            <!--</dependency>-->
+            <!--</dependencies>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <!-- any version of Groovy \>= 1.5.0 should work here -->
+
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.10</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.orbitz.consul</groupId>
+            <artifactId>consul-client</artifactId>
+            <version>0.12.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-core</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>bintray</name>
+            <url>http://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
+
+</project>

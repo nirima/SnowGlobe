@@ -1,0 +1,20 @@
+snowglobe {
+    module("env") {
+
+
+        test_provider {
+
+        }
+    }
+
+    module("app")
+    {
+        imports {
+            using module('env').docker_provider();
+        }
+
+        docker_container("frontend") {
+
+        }
+    }
+}

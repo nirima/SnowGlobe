@@ -1,0 +1,35 @@
+
+@import "theme.scss";
+
+
+
+
+/* You can add global styles to this file, and also import other style files */
+body {
+  border: 0;
+margin: 0;
+}
+
+.theme-dropdown .dropdown-menu {
+  position: static;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.theme-showcase > p > .btn {
+  margin: 5px 0;
+}
+
+.theme-showcase .navbar .container {
+  width: auto;
+}
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+
+
+.snowglobe-body {
+  background: #fafafa;
+  font-family: Roboto,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
+}

@@ -1,0 +1,26 @@
+package com.nirima.snowglobe.test
+
+snowglobe
+    {
+        module("base") {
+            docker_provider {
+                //host = "tcp://localhost:2376"
+                host = "unix:///var/run/docker.sock"
+            }
+
+            docker_container("ubuntu") {
+                image = "${docker_image("ubuntu").name}"
+            }
+
+            docker_image("ubuntu")
+            {
+                 name = "${docker_registry_image("ubuntu").name}"
+                 pull_trigger = "${docker_registry_image("ubuntu").sha256_digest}"
+            }
+
+            docker_registry_image("ubuntu") {
+                name = "ubuntu:precise"
+            }
+
+        }
+    }

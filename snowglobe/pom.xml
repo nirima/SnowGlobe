@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.nirima.snowglobe</groupId>
+        <artifactId>master-pom</artifactId>
+        <version>0.0.1</version>
+        <relativePath>../pom/pom.xml</relativePath>
+    </parent>
+
+
+    <groupId>com.nirima</groupId>
+    <artifactId>snowglobe</artifactId>
+    <packaging>pom</packaging>
+  
+    <modules>
+        <module>server</module>
+        <module>snowglobe-core</module>
+        <module>snowglobe-sinatra</module>
+        <module>snowglobe-exe</module>
+    </modules>
+    
+
+</project>

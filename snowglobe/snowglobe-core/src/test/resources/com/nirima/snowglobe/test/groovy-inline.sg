@@ -1,0 +1,87 @@
+package com.nirima.snowglobe.test
+
+
+
+def defineEnv() {
+    return {
+    println "DEFINE";
+          module("env")
+                             {
+                                 def foo = "bar";
+
+                                   docker_provider {
+                                                  //host = "tcp://localhost:2376"
+                                                  host = "unix:///var/run/docker.sock"
+                                              }
+                                  docker_image("test") {
+                                    name = "${foo}"
+
+                                }
+
+                             }
+
+        }
+}
+
+
+snowglobe
+{
+
+        def v = 'hello';
+
+      //  println this;
+      //  println proxy;
+
+        evaluate defineEnv();
+
+
+
+
+           if( v == 'hello' )
+           {
+                println "+FOO";
+
+                module("db")
+                {
+                    imports {
+                    using module('env').docker_provider();
+                   }
+                    docker_image("test") {
+                                  name = "-FOO"
+
+                              }
+
+                }
+           } else
+           {
+               println "+bar";
+                module("db")
+                               {
+                                   imports {
+                                   using module('env').docker_provider();
+                                  }
+                                   docker_image("test") {
+                                                 name = "-BAZ"
+
+                                             }
+
+                               }
+
+           }
+
+            module("dep") {
+
+            imports {
+                        using module('env').docker_provider();
+                    }
+
+                docker_image("test") {
+                       name = "${module('db').docker_image("test").name}"
+                          println "${module('db').docker_image("test").name}"
+                   }
+
+            }
+
+            println "complet";
+}
+

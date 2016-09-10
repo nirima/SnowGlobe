@@ -1,0 +1,31 @@
+package com.nirima.snowglobe.test
+
+import groovy.transform.Field
+
+println "Loading...";
+
+@Field
+String textProp = 'default';
+
+def call() {
+     println "DEFINE";
+ 
+            println "${textProp}"
+              module("env")
+                                 {
+                                     def foo = "bar";
+
+                                       docker_provider {
+                                                      //host = "tcp://localhost:2376"
+                                                      host = "unix:///var/run/docker.sock"
+                                                  }
+                                      docker_image("test") {
+                                        name = "${foo}"
+
+                                    }
+
+                                 }
+
+            }
+
+return this;

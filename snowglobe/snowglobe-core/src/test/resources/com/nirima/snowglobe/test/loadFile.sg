@@ -1,0 +1,68 @@
+package com.nirima.snowglobe.test
+
+
+
+
+snowglobe
+{
+
+        def v = 'hello';
+
+
+        def lf = load 'loadedFile.sg'
+
+        lf();
+
+        println "LTP = ${lf.textProp}"
+
+     //   lf.textProp = 'bibblex';
+        
+
+           if( v == 'hello' )
+           {
+                println "+FOO";
+
+                module("db")
+                {
+                    imports {
+                    using module('env').docker_provider();
+                   }
+                    docker_image("test") {
+                                  name = "-FOO"
+
+                              }
+
+                }
+           } else
+           {
+               println "+bar";
+                module("db")
+                               {
+                                   imports {
+                                   using module('env').docker_provider();
+                                  }
+                                   docker_image("test") {
+                                                 name = "-BAZ"
+
+                                             }
+
+                               }
+
+           }
+
+            module("dep") {
+
+            imports {
+                        using module('env').docker_provider();
+                    }
+
+                docker_image("test") {
+                       name = "${module('db').docker_image("test").name}"
+                          println "${module('db').docker_image("test").name}"
+                   }
+
+            }
+
+            println "complet";
+}
+

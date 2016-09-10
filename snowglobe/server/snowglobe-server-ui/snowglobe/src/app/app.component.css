@@ -1,0 +1,42 @@
+#icon {
+  -webkit-filter : hue-rotate(180deg);
+
+  filter: brightness(1.25);
+}
+
+
+app-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 53px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/*app-root {*/
+  /*top: 92px;*/
+/*}*/
+
+app-root > .main-content {
+  overflow-y: auto;
+}
+
+.main-content {
+
+}
+
+
+@media (max-width: 720px) {
+
+
+}
