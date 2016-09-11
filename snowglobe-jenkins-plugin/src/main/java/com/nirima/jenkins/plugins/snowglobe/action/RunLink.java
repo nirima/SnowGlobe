@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import hudson.model.Project;
 import hudson.model.Run;
+import hudson.model.TopLevelItem;
 import jenkins.model.Jenkins;
 
 /**
@@ -19,6 +20,12 @@ public class RunLink implements Serializable {
   }
 
   protected Run<?,?> getRun() {
-    return ((Project) Jenkins.getInstance().getItem(projectName)).getBuildByNumber(runId);
+    Project
+        item = ((Project) Jenkins.getInstance().getItem(projectName));
+
+    if( item == null )
+      throw new IllegalStateException("Project " + projectName + " no longer exists");
+
+    return item.getBuildByNumber(runId);
   }
 }

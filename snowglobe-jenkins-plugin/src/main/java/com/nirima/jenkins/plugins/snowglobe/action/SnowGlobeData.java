@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * Created by magnayn on 09/09/2016.
@@ -52,10 +51,10 @@ public class SnowGlobeData implements Serializable {
 
   public SnowGlobeData destroy()
       throws IOException {
-    InputStream a = new ByteArrayInputStream(script.getBytes());
+    InputStream a = new ByteArrayInputStream(script.getBytes("UTF-8"));
     InputStream s = null;
     if( state != null )
-      s = new ByteArrayInputStream(state.getBytes());
+      s = new ByteArrayInputStream(state.getBytes("UTF-8"));
 
     SGExec exec = new SGExec( a, s );
 
@@ -73,10 +72,10 @@ public class SnowGlobeData implements Serializable {
   }
 
   public String graph() throws IOException {
-    InputStream a = new ByteArrayInputStream(script.getBytes());
+    InputStream a = new ByteArrayInputStream(script.getBytes("UTF-8"));
     InputStream s = null;
     if( state != null )
-      s = new ByteArrayInputStream(state.getBytes());
+      s = new ByteArrayInputStream(state.getBytes("UTF-8"));
 
     SGExec exec = new SGExec( a, s );
 

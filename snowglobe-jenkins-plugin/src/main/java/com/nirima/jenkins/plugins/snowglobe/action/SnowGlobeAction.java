@@ -2,7 +2,6 @@ package com.nirima.jenkins.plugins.snowglobe.action;
 
 import com.nirima.jenkins.plugins.snowglobe.Consts;
 import com.nirima.jenkins.plugins.snowglobe.SnowGlobePluginConfiguration;
-import com.nirima.snowglobe.SGExec;
 
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -14,25 +13,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Action;
-import hudson.model.DependencyGraph;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.util.LogTaskListener;
 import jenkins.model.Jenkins;
@@ -42,7 +35,7 @@ import jenkins.model.Jenkins;
  * SnowGlobes linked to a job (action badge)
  */
 public class SnowGlobeAction implements Action, Serializable,
-                                                        Describable<RegisteredScriptAction> {
+                                                        Describable<SnowGlobeAction> {
 
   private static final Logger LOGGER = Logger.getLogger(SnowGlobeAction.class.getName());
 
@@ -112,7 +105,7 @@ public class SnowGlobeAction implements Action, Serializable,
   }
 
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)  throws IOException, ServletException, InterruptedException {
-    String path = req.getRestOfPath();
+    //String path = req.getRestOfPath();
 
     String id = req.getParameter("id");
 
@@ -169,7 +162,7 @@ public class SnowGlobeAction implements Action, Serializable,
    * Just for assisting form related stuff.
    */
   @Extension
-  public static class DescriptorImpl extends Descriptor<RegisteredScriptAction> {
+  public static class DescriptorImpl extends Descriptor<SnowGlobeAction> {
     public String getDisplayName() {
       return "SnowGlobe";
     }

@@ -1,7 +1,5 @@
 package com.nirima.jenkins.plugins.snowglobe.action;
 
-import com.nirima.snowglobe.core.SnowGlobe;
-
 import java.io.IOException;
 import java.io.Serializable;
 

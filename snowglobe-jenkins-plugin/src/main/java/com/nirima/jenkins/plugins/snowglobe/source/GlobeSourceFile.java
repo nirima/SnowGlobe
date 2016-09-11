@@ -38,7 +38,7 @@ public class GlobeSourceFile extends GlobeSource {
       public SnowGlobeData invoke(File file, VirtualChannel virtualChannel)
           throws IOException, InterruptedException {
 
-        return new SnowGlobeData(name, FileUtils.readFileToString(file), null);
+        return new SnowGlobeData(name, new String(FileUtils.readFileToByteArray(file),"UTF-8"), null);
       }
     });
   }
