@@ -17,6 +17,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
+            <version>3.0.2</version>
             <configuration>
                 <archive>
                     <manifest>
@@ -27,7 +28,7 @@
         </plugin>
 
         <plugin>
-            <groupId>org.dstovall</groupId>
+            <groupId>com.jolira</groupId>
             <artifactId>onejar-maven-plugin</artifactId>
             <version>1.4.4</version>
             <executions>
@@ -55,10 +56,10 @@
             <version>2.0.31</version>
         </dependency>
     </dependencies>
-    <pluginRepositories>
+  <!--   <pluginRepositories>
         <pluginRepository>
             <id>onejar-maven-plugin.googlecode.com</id>
             <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
         </pluginRepository>
-    </pluginRepositories>
+    </pluginRepositories> -->
 </project>
