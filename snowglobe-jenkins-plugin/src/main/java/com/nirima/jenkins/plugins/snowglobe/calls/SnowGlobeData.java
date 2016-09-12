@@ -1,6 +1,10 @@
-package com.nirima.jenkins.plugins.snowglobe.action;
+package com.nirima.jenkins.plugins.snowglobe.calls;
 
+import com.nirima.jenkins.plugins.snowglobe.SnowGlobePluginConfiguration;
+import com.nirima.jenkins.plugins.snowglobe.registry.SnowGlobeRegistry;
 import com.nirima.snowglobe.SGExec;
+
+import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.Whitelisted;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,19 +17,18 @@ import java.io.Serializable;
  */
 public class SnowGlobeData implements Serializable {
 
-  public String id;
-
   public String script;
   public String state;
 
   public String lastResult;
 
-  public SnowGlobeData(String id, String script, String state) {
-    this.id = id;
+  public SnowGlobeData(String script, String state) {
+
     this.script = script;
     this.state = state;
   }
 
+  @Whitelisted
   public SnowGlobeData apply()
       throws IOException {
     InputStream a = new ByteArrayInputStream(script.getBytes("UTF-8"));
@@ -49,6 +52,7 @@ public class SnowGlobeData implements Serializable {
     return this;
   }
 
+  @Whitelisted
   public SnowGlobeData destroy()
       throws IOException {
     InputStream a = new ByteArrayInputStream(script.getBytes("UTF-8"));
@@ -71,6 +75,7 @@ public class SnowGlobeData implements Serializable {
     return this;
   }
 
+  @Whitelisted
   public String graph() throws IOException {
     InputStream a = new ByteArrayInputStream(script.getBytes("UTF-8"));
     InputStream s = null;
@@ -86,4 +91,5 @@ public class SnowGlobeData implements Serializable {
     return new String(baos.toByteArray(),"UTF-8");
 
   }
+
 }

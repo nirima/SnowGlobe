@@ -1,5 +1,11 @@
 package com.nirima.jenkins.plugins.snowglobe;
 
+import com.nirima.jenkins.plugins.snowglobe.registry.SnowGlobeRegistry;
+
+import net.sf.json.JSONObject;
+
+import org.kohsuke.stapler.StaplerRequest;
+
 import hudson.Extension;
 import hudson.Functions;
 import hudson.Util;
@@ -12,6 +18,18 @@ import jenkins.model.GlobalConfiguration;
 public class SnowGlobePluginConfiguration extends GlobalConfiguration {
 
   private String dotExe;
+
+  private SnowGlobeRegistry registry;
+
+  public SnowGlobePluginConfiguration() {
+      load();
+  }
+
+  @Override
+  public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+    req.bindJSON(this,json);
+    return true;
+  }
 
   /**
    * Returns this singleton instance.
@@ -38,4 +56,6 @@ public class SnowGlobePluginConfiguration extends GlobalConfiguration {
     this.dotExe = dotExe;
     save();
   }
+
+
 }

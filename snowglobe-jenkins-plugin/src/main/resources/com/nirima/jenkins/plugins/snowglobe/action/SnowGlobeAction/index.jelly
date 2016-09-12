@@ -7,8 +7,10 @@
         </l:header>
         <l:main-panel>
             <h1>Snowglobes</h1>
-
             <j:set var="instance" value="${it}"/>
+
+            <h2>Run ID = ${it.id}</h2>
+
 
             <form method="post" action="controlSubmit" name="controlSubmit" id="control">
                 <input type="hidden" id="launchId" name="launchId" value=""/>
@@ -21,14 +23,14 @@
                 <h2>SnowGlobe ${res.id}</h2>
                 <h3>Script</h3>
                 <pre>
-                ${res.script}
+                ${res.data.script}
                 </pre>
                 <h3>State</h3>
-                <pre>${res.state}</pre>
+                <pre>${res.data.state}</pre>
                 <h3>Graph</h3>
                 <p><img src="graph.png?id=${res.id}"/></p>
                 <h3>Last Result</h3>
-                <p>${res.lastResult}</p>
+                <p>${res.data.lastResult}</p>
                 <hr/>
                 <input type="button" value="Apply" onclick="apply('${res.id}')"></input>
                 <input type="button" value="Destroy" onclick="destroy('${res.id}')"></input>

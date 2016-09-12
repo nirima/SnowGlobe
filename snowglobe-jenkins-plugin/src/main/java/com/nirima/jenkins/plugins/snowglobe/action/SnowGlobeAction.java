@@ -2,6 +2,8 @@ package com.nirima.jenkins.plugins.snowglobe.action;
 
 import com.nirima.jenkins.plugins.snowglobe.Consts;
 import com.nirima.jenkins.plugins.snowglobe.SnowGlobePluginConfiguration;
+import com.nirima.jenkins.plugins.snowglobe.calls.SnowGlobeData;
+import com.nirima.jenkins.plugins.snowglobe.registry.SnowGlobeRegistry;
 
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -13,9 +15,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,30 +45,53 @@ public class SnowGlobeAction implements Action, Serializable,
 
   private static final Logger LOGGER = Logger.getLogger(SnowGlobeAction.class.getName());
 
-  private Map<String, SnowGlobeData> states = new HashMap<>();
-  public final RunLink runLink;
+  private String id;
 
-  public SnowGlobeAction(Run<?, ?> run) {
-    runLink = new RunLink(run);
+  public SnowGlobeAction(String runId) {
+    this.id = runId;
   }
 
-  public SnowGlobeData createSnowglobe(RegisteredScript script) {
-  //  SnowGlobeData data = new SnowGlobeData(script.scri  return null;pt,null);
-  //  states.add( data );
-  //  return data;
-    return null;
+  public String getId() {
+    return id;
   }
+
+  public static class ActionData {
+    public String id;
+    public SnowGlobeData data;
+
+    public ActionData(String id, SnowGlobeData data) {
+      this.id = id;
+      this.data = data;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public SnowGlobeData getData() {
+      return data;
+    }
+  }
+
 
   public SnowGlobeData createSnowglobe(String script) {
       return null;
   }
 
   public SnowGlobeData getDataById(String id) {
-    return states.get(id);
+    return SnowGlobeRegistry.get().getById(id);
   }
 
-  public Collection<SnowGlobeData> getStates() {
-    return states.values();
+  public Collection<ActionData> getStates() {
+    Set<String> ids =  SnowGlobeRegistry.get().getGlobesForRunId(this.id);
+
+    Set<ActionData> data = new HashSet<>();
+
+    if( ids != null )
+      ids.forEach( it -> data.add( new ActionData(it, SnowGlobeRegistry.get().getById(it) )) );
+
+    return data;
+
   }
 
   @Override
@@ -143,20 +172,15 @@ public class SnowGlobeAction implements Action, Serializable,
   }
 
   private void apply(String id) throws IOException {
-    Run<?,?> run = runLink.getRun();
     getDataById( id ).apply();
-    run.save();
+    SnowGlobeRegistry.get().save();
   }
 
   private void destroy(String id) throws IOException {
-    Run<?,?> run = runLink.getRun();
     getDataById( id ).destroy();
-    run.save();
+    SnowGlobeRegistry.get().save();
   }
 
-  public void save(SnowGlobeData data) {
-      states.put(data.id,data);
-  }
 
   /**
    * Just for assisting form related stuff.
