@@ -1,10 +1,12 @@
 package com.nirima.snowglobe.core
 
 import com.nirima.snowglobe.plan.PlanAction
+import groovy.util.logging.Slf4j
 import org.reflections.Reflections
 
 import java.lang.reflect.ParameterizedType
 
+@Slf4j
 public class Core {
     Map<String, Class> classesMap = [:];
 
@@ -36,7 +38,7 @@ public class Core {
     public Class getClassForName(String name) {
         Class aClass =  classesMap.get(name);
         if( aClass == null )
-            println "I don't know what class ${name} is for";
+            log.error "I don't know what class ${name} is for";
 
         return aClass;
     }
@@ -122,6 +124,7 @@ public class ModuleImports {
     }
 }
 
+@Slf4j
 public class Module {
     protected SnowGlobe parent;
     public  String id;
@@ -136,7 +139,7 @@ public class Module {
     }
 
     public void accept(Object context) {
-        println "Accept in ${this}";
+        log.debug "Accept in ${this}";
         closure.delegate = context;
         closure.resolveStrategy = Closure.DELEGATE_FIRST
 
@@ -192,7 +195,7 @@ public class State {
     }
 
     public void accept(Object context) {
-        println "State Accept in ${this} CTX= ${context} ";
+        log.debug "State Accept in ${this} CTX= ${context} ";
 
         assert(context != null)
 
@@ -280,7 +283,7 @@ abstract public class Resource<T extends ResourceState>
 
     public void accept(Object context) {
 
-        println "Accept in ${this}";
+        log.debug "Accept in ${this}";
 
         assert(context != null)
 
@@ -328,7 +331,7 @@ public class Provider {
     }
 
     public void accept(Object context) {
-        println "Accept in ${this}";
+        log.debug "Accept in ${this}";
         closure.delegate = context;
         closure.resolveStrategy = Closure.DELEGATE_FIRST
 

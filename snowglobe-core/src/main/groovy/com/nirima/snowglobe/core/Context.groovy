@@ -184,8 +184,7 @@ public class ProviderContext extends Context<Provider> {
             getProxy().setProperty(name,value);
         }
         catch( Exception ex ) {
-            log.error ("Error setting state for resource ${getProxy()} property ${name} with value ${value}");
-            println ex;
+            log.error ("Error setting state for resource ${getProxy()} property ${name} with value ${value}", ex);
             throw ex;
         }
 
@@ -474,19 +473,18 @@ public class StateContext {
 
     void setProperty(String name, Object value) {
 
-        println "     set ${name}=${value} on ${this}"
+        log.debug "     set ${name}=${value} on ${this}"
 
         try {
             getProxy().setProperty(name, value);
         }
         catch (Exception ex) {
             log.error(
-                    "Error setting state for resource ${getProxy()} property ${name} with value ${value}");
-            println ex;
+                    "Error setting state for resource ${getProxy()} property ${name} with value ${value}", ex);
             throw ex;
         }
 
-        println "     ±set ${name}=${value} on ${this}"
+        log.debug "     done set ${name}=${value} on ${this}"
 
     }
 

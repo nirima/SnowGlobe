@@ -10,7 +10,9 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-
+    <properties>
+        <docker-plugin.version>0.16.2</docker-plugin.version>
+    </properties>
 
     <build>
         <plugins>
@@ -87,7 +89,7 @@
         <dependency>
             <groupId>com.nirima</groupId>
             <artifactId>docker-plugin</artifactId>
-            <version>0.16.1</version>
+            <version>${docker-plugin.version}</version>
             <scope>provided</scope>
         </dependency>
 

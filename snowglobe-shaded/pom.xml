@@ -68,6 +68,12 @@
             <artifactId>snowglobe-core</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <artifactId>docker-java</artifactId>
+                    <groupId>com.github.docker-java</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.nirima.snowglobe</groupId>

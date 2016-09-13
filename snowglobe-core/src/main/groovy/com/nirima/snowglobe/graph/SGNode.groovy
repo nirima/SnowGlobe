@@ -2,6 +2,7 @@ package com.nirima.snowglobe.graph
 
 import com.google.common.base.Objects
 import com.nirima.snowglobe.core.*
+import groovy.util.logging.Slf4j
 
 /**
  * Created by magnayn on 05/09/2016.
@@ -86,6 +87,7 @@ class SGNode {
     }
 }
 
+@Slf4j
 class Graph {
     SGNode rootNode;
 
@@ -135,7 +137,7 @@ class Graph {
 
         // Remove the children too???
         if( node.children.size() > 0 ) {
-            println "CHILDREN ARE HERE. NOT SURE."
+            log.warn "CHILDREN ARE HERE. NOT SURE."
         }
 
         node.children.each {

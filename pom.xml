@@ -12,6 +12,12 @@
         <groovyVersion>2.4.7</groovyVersion>
     </properties>
 
+    <scm>
+        <connection>scm:git:git://github.com/nirima/SnowGlobe.git</connection>
+        <developerConnection>scm:git:git@github.com:nirima/SnowGlobe.git</developerConnection>
+        <url>http://github.com/nirima/SnowGlobe</url>
+    </scm>
+
  <build>
         <plugins>
              <plugin>
