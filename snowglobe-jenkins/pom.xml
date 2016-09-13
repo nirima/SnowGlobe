@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.nirima.snowglobe</groupId>
+    <artifactId>snowglobe-jenkins</artifactId>
+
+    <parent>
+        <groupId>com.nirima</groupId>
+        <artifactId>snowglobe</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenVersion}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>addSources</goal>
+                            <goal>addTestSources</goal>
+                            <!--<goal>generateStubs</goal>-->
+                            <goal>compile</goal>
+                            <!--<goal>testGenerateStubs</goal>-->
+                            <goal>testCompile</goal>
+                            <!--<goal>removeStubs</goal>-->
+                            <!--<goal>removeTestStubs</goal>-->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.codehaus.gmaven</groupId>-->
+            <!--<artifactId>gmaven-plugin</artifactId>-->
+            <!--<version>${gmavenVersion}</version>-->
+
+            <!--<configuration>-->
+            <!--&lt;!&ndash;<source>src/main/groovy</source>&ndash;&gt;-->
+            <!--<providerSelection>${gmavenProviderSelection}</providerSelection>-->
+            <!--<sourceEncoding>UTF-8</sourceEncoding>-->
+            <!--<source/>-->
+            <!--</configuration>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>generateStubs</goal>-->
+            <!--<goal>compile</goal>-->
+            <!--<goal>generateTestStubs</goal>-->
+            <!--<goal>testCompile</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--<dependencies>-->
+            <!--<dependency>-->
+            <!--<groupId>org.codehaus.groovy</groupId>-->
+            <!--<artifactId>groovy-all</artifactId>-->
+            <!--<version>${groovyVersion}</version>-->
+            <!--</dependency>-->
+            <!--</dependencies>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jenkins-ci.main</groupId>
+            <artifactId>jenkins-core</artifactId>
+            <version>2.7</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nirima.snowglobe</groupId>
+            <artifactId>snowglobe-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nirima</groupId>
+            <artifactId>docker-plugin</artifactId>
+            <version>0.16.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <!-- any version of Groovy \>= 1.5.0 should work here -->
+            <version>2.4.7</version>
+        </dependency>
+
+    </dependencies>
+
+    <repositories>
+        <repository>
+          <id>repo.jenkins-ci.org</id>
+          <url>http://repo.jenkins-ci.org/public/</url>
+        </repository>
+        <repository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>central</id>
+          <name>Central Repository</name>
+          <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+      </repositories>
+
+</project>
