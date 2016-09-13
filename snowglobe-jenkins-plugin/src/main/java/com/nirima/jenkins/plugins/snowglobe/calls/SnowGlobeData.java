@@ -3,6 +3,8 @@ package com.nirima.jenkins.plugins.snowglobe.calls;
 import com.nirima.jenkins.plugins.snowglobe.SnowGlobePluginConfiguration;
 import com.nirima.jenkins.plugins.snowglobe.registry.SnowGlobeRegistry;
 import com.nirima.snowglobe.SGExec;
+import com.nirima.snowglobe.core.Core;
+import com.nirima.snowglobe.jenkins.JenkinsDockerProvider;
 
 import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.Whitelisted;
 

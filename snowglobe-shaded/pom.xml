@@ -50,6 +50,9 @@
         <mockito.version>1.10.19</mockito.version>
 
 
+        <!-- reflections -->
+        <javassist.version>3.18.2-GA</javassist.version>
+
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
@@ -66,6 +69,12 @@
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.nirima.snowglobe</groupId>
+            <artifactId>snowglobe-jenkins</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency>
 
         <dependency>
             <groupId>com.orbitz.consul</groupId>
@@ -78,7 +87,19 @@
             <version>2.1.2</version>
         </dependency>
 
-
+        <!-- reflections -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.10</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
+            <optional>false</optional> <!-- case: when not actually scanning with javassist or if using {@link Reflections.collect()} -->
+        </dependency>
         <!-- docker-java begin -->
         <dependency>
             <groupId>com.github.docker-java</groupId>
@@ -261,6 +282,7 @@
                             <include>com.github.docker-java:*</include>
                             <include>com.nirima.snowglobe:*</include>
                             <include>com.google.guava:*</include>
+                            <include>org.reflections:*</include>
                         </includes>
                     </artifactSet>
                     <relocations>

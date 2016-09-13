@@ -8,12 +8,7 @@ import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientBuilder
 import com.github.dockerjava.core.command.PullImageResultCallback
 import com.google.common.base.Objects
-import com.nirima.snowglobe.core.DataSource
-import com.nirima.snowglobe.core.DataSourceState
-import com.nirima.snowglobe.core.ResourceState
-import com.nirima.snowglobe.core.Module
-import com.nirima.snowglobe.core.Provider
-import com.nirima.snowglobe.core.Resource
+import com.nirima.snowglobe.core.*
 import com.nirima.snowglobe.plan.PlanAction
 
 /**
@@ -131,6 +126,7 @@ public class DockerContainerState extends ResourceState {
     }
 }
 
+@SGItem("docker_container")
 public class DockerContainer extends Resource<DockerContainerState> {
 
     DockerContainer(Module module, String id,
@@ -171,7 +167,7 @@ public class DockerImageState extends ResourceState {
     }
 }
 
-
+@SGItem("docker_image")
 public class DockerImage extends Resource<DockerImageState> {
 
 
@@ -204,6 +200,7 @@ public class DockerImage extends Resource<DockerImageState> {
 
 }
 
+@SGItem("docker_registry_image")
 public class DockerRegistryImage extends DataSource<DockerRegistryImageState> {
 
     DockerRegistryImage(Module module, String id, Closure closure) {
@@ -263,6 +260,7 @@ public class DockerRegistryImageState extends DataSourceState {
 //    }
 }
 
+@SGItem("docker_provider")
 public class DockerProvider extends Provider {
     public String host;
 
@@ -284,7 +282,7 @@ public class DockerProvider extends Provider {
 }
 
 
-
+@SGItem("docker_registry")
 public class DockerRegistry extends Provider {
     public String username;
     public String password;

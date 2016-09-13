@@ -1,17 +1,8 @@
 package com.nirima.snowglobe.consul
 
-import com.github.dockerjava.api.DockerClient
-import com.github.dockerjava.api.command.CreateContainerCmd
-import com.nirima.snowglobe.docker.DockerContainerState
-import com.nirima.snowglobe.docker.DockerProvider
-import com.nirima.snowglobe.plan.NodePair
-import com.nirima.snowglobe.plan.PlanAction
 import com.nirima.snowglobe.plan.PlanActionBase
 import com.orbitz.consul.Consul
 import com.orbitz.consul.KeyValueClient
-
-
-
 
 class ConsulKeyPrefixAction extends PlanActionBase<ConsulKeyPrefix, ConsulKeyPrefixState> {
 

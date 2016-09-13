@@ -1,15 +1,7 @@
 package com.nirima.snowglobe.core
 
-i
-import com.nirima.snowglobe.consul.ConsulKeyPrefix
-import com.nirima.snowglobe.consul.ConsulKeys
-import com.nirima.snowglobe.docker.DockerImage
-import com.nirima.snowglobe.consul.ConsulProvider
-import com.nirima.snowglobe.docker.DockerContainer
-import com.nirima.snowglobe.docker.DockerProvider
-import com.nirima.snowglobe.docker.DockerRegistry
-import com.nirima.snowglobe.docker.DockerRegistryImage
 import com.nirima.snowglobe.plan.PlanAction
+import org.reflections.Reflections
 
 import java.lang.reflect.ParameterizedType
 
@@ -18,20 +10,27 @@ public class Core {
 
     public static Core INSTANCE  = new Core();
 
-    // TODO: Build all this from annotations
+
     private Core() {
-        classesMap["docker_container"] = DockerContainer.class;
-        classesMap["docker_provider"]  = DockerProvider.class;
-        classesMap["docker_registry"]  = DockerRegistry.class;
-        classesMap["docker_image"]     = DockerImage.class;
-        classesMap["docker_registry_image"]     = DockerRegistryImage.class;
 
-        classesMap["consul_provider"]  = ConsulProvider.class;
+        Reflections reflections = new Reflections("com.nirima.snowglobe");
 
-        classesMap["consul_key_prefix"]  = ConsulKeyPrefix.class;
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(SGItem.class);
 
-        classesMap["consul_keys"]  = ConsulKeys.class;
+        annotated.each {
 
+            it -> try {
+                classesMap.put(it.getAnnotation(SGItem.class).value(), it)
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+
+    }
+
+    public void register(Class c, String name) {
+        classesMap[name] = c;
     }
 
     public Class getClassForName(String name) {
@@ -181,7 +180,7 @@ public class Module {
     }
 
     Resource getResource(Class klass, String id) {
-        resources.find { it.getClass() == klass && it.id == id }
+        resources.find {  klass.isAssignableFrom( it.getClass() ) && it.id == id }
     }
 }
 

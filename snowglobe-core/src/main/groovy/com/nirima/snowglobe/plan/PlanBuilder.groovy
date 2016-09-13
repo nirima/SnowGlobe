@@ -1,14 +1,13 @@
 package com.nirima.snowglobe.plan
 
+import com.nirima.snowglobe.core.Resource
 import com.nirima.snowglobe.core.ResourceContext
 import com.nirima.snowglobe.core.ResourceState
-import com.nirima.snowglobe.core.Resource
 import com.nirima.snowglobe.core.SnowGlobeContext
 import com.nirima.snowglobe.graph.DependencyList_DFS
 import com.nirima.snowglobe.graph.Graph
 import com.nirima.snowglobe.graph.GraphBuilder
 import com.nirima.snowglobe.graph.SGNode
-import groovy.transform.CompileStatic
 
 /**
  * Created by magnayn on 05/09/2016.

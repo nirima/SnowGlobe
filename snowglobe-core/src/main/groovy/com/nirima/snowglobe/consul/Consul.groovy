@@ -1,17 +1,14 @@
 package com.nirima.snowglobe.consul
 
 import com.google.common.net.HostAndPort
-import com.nirima.snowglobe.core.ResourceState
-import com.nirima.snowglobe.core.Module
-import com.nirima.snowglobe.core.Provider
-import com.nirima.snowglobe.core.Resource
-import com.nirima.snowglobe.plan.NodePair
+import com.nirima.snowglobe.core.*
 import com.nirima.snowglobe.plan.PlanAction
 import com.orbitz.consul.Consul
 
 /**
  * Created by magnayn on 04/09/2016.
  */
+@SGItem("consul_provider")
 class ConsulProvider extends Provider {
 
     public String address;
@@ -48,7 +45,7 @@ class ConsulKeyPrefixState extends ResourceState {
         }
     }
 }
-
+@SGItem("consul_key_prefix")
 class ConsulKeyPrefix extends Resource<ConsulKeyPrefixState> {
 
 
@@ -101,7 +98,7 @@ class ConsulKeysState extends ResourceState {
         }
     }
 }
-
+@SGItem("consul_keys")
 class ConsulKeys extends Resource<ConsulKeysState> {
 
 

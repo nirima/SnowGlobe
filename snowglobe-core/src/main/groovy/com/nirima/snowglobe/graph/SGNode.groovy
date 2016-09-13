@@ -1,13 +1,7 @@
 package com.nirima.snowglobe.graph
 
 import com.google.common.base.Objects
-import com.nirima.snowglobe.core.Context
-import com.nirima.snowglobe.core.Dependency
-import com.nirima.snowglobe.core.Module
-import com.nirima.snowglobe.core.Provider
-import com.nirima.snowglobe.core.Resource
-import com.nirima.snowglobe.core.SnowGlobe
-import com.nirima.snowglobe.core.SnowGlobeContext
+import com.nirima.snowglobe.core.*
 
 /**
  * Created by magnayn on 05/09/2016.

@@ -3,17 +3,9 @@ package com.nirima.snowglobe.docker
 import com.github.dockerjava.api.DockerClient
 import com.github.dockerjava.api.command.CreateContainerCmd
 import com.github.dockerjava.api.command.CreateContainerResponse
-import com.github.dockerjava.api.command.PullImageCmd
 import com.github.dockerjava.api.exception.NotModifiedException
-import com.github.dockerjava.api.model.AuthConfig
-import com.github.dockerjava.api.model.ExposedPort
-import com.github.dockerjava.api.model.Image
-import com.github.dockerjava.api.model.Link
-import com.github.dockerjava.api.model.Ports
-import com.github.dockerjava.api.model.VolumesFrom
-import com.github.dockerjava.core.command.PullImageResultCallback
+import com.github.dockerjava.api.model.*
 import com.nirima.snowglobe.plan.PlanActionBase
-
 
 /**
  * Created by magnayn on 05/09/2016.

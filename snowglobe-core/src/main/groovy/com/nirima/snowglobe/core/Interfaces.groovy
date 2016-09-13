@@ -1,5 +1,18 @@
 package com.nirima.snowglobe.core
 
+import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
+import java.lang.annotation.Target
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME
+
+@Target(value = [ElementType.TYPE] )
+@Retention(RUNTIME)
+public @interface SGItem
+{
+    String value();
+}
+
 // Element with an ID
 public interface IElement {
     String getId();

@@ -32,9 +32,18 @@
 
    <modules>
      <module>snowglobe-core</module>
-     <module>snowglobe-exe</module>
-     <module>snowglobe-shaded</module>
-     <module>snowglobe-jenkins-plugin</module>
+       <module>snowglobe-jenkins</module>
+       <module>snowglobe-exe</module>
+       <module>snowglobe-shaded</module>
+       <module>snowglobe-jenkins-plugin</module>
    </modules>
 
+   <!-- <dependencies>
+    <dependency>
+       <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>2.14</version>
+    </dependency>
+    </dependencies> -->
+    
 </project>

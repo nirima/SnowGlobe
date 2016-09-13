@@ -1,8 +1,5 @@
 package com.nirima.snowglobe.core
-
-import com.google.common.base.MoreObjects
-import com.google.common.base.Objects
-
+import groovy.util.logging.Slf4j
 /**
  * Created by magnayn on 04/09/2016.
  */
@@ -60,15 +57,18 @@ public class Dependency {
         return result
     }
 
+
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-                .add("from", from)
-                .add("to", to)
-                .toString();
+        return """\
+Dependency{
+    from=$from,
+    to=$to
+}"""
     }
 }
 
+@Slf4j
 public class SnowGlobeContext extends Context<SnowGlobe> {
 
     List<ModuleContext> modules = [];
@@ -100,7 +100,7 @@ public class SnowGlobeContext extends Context<SnowGlobe> {
     }
 
     public void buildModules() {
-        println("Build Modules")
+        log.trace 'Build Modules';
         modules.each {
             processModule(it);
         }
@@ -111,12 +111,12 @@ public class SnowGlobeContext extends Context<SnowGlobe> {
         dependencies = [];
         processedModules = [];
         inProcessModules = [];
-        println("Visit Modules")
+        log.trace "Visit Modules"
         getProxy().accept(this);
     }
 
     private void processModule(ModuleContext context) {
-        println("Build Module ${context}")
+        log.debug "Build Module ${context}"
 
         if( processedModules.contains(context))
             return;
@@ -129,12 +129,12 @@ public class SnowGlobeContext extends Context<SnowGlobe> {
         inProcessModules.remove(context);
 
         processedModules.add(context);
-        println("Built Module ${context}")
+        log.debug "Built Module ${context}"
     }
 
     public Context<?> getElement(ModuleContext from, Class klass, String id) {
         ModuleContext result = modules.
-                find { it.getProxy().getClass() == klass && it.getProxy().id == id }
+                find {  klass.isAssignableFrom( it.getProxy().getClass() ) && it.getProxy().id == id }
         if (result == null)
             throw IllegalStateException("Cannot find resource ${id} type ${klass}");
 
@@ -157,7 +157,7 @@ public class SnowGlobeContext extends Context<SnowGlobe> {
 }
 
 
-
+@Slf4j
 public class ProviderContext extends Context<Provider> {
     ModuleContext parent;
 
@@ -171,20 +171,20 @@ public class ProviderContext extends Context<Provider> {
             Provider resource = getProxy();
             return resource.getProperty(name);
         } catch(Exception ex) {
-            println "State for resource " + getProxy() + " does not have property " + name;
+            log.error "State for resource " + getProxy() + " does not have property " + name;
             throw ex;
         }
     }
 
     void setProperty(String name, Object value) {
 
-        println "     set ${name}=${value} on ${this}"
+        log.debug "     set ${name}=${value} on ${this}"
 
         try {
             getProxy().setProperty(name,value);
         }
         catch( Exception ex ) {
-            println("Error setting state for resource ${getProxy()} property ${name} with value ${value}");
+            log.error ("Error setting state for resource ${getProxy()} property ${name} with value ${value}");
             println ex;
             throw ex;
         }
@@ -214,7 +214,13 @@ public class ModuleReferenceContext
         Object[] theArgs = (Object[]) args;
 
         Class c = Core.INSTANCE.getClassForName(name);
-        referenceTo.getElement(referenceFrom,c,(String)theArgs[0])
+
+        // We can use provider("name") or provider() or provider(null)
+        String id = null;
+        if( theArgs.length > 0 )
+            id = theArgs[0];
+
+        referenceTo.getElement(referenceFrom,c,(String)id)
     }
 }
 
@@ -249,6 +255,7 @@ public class ModuleImportContext extends Context<ModuleImports> {
     }
 }
 
+@Slf4j
 public class ModuleContext extends Context<Module>{
     SnowGlobeContext parent;
 
@@ -355,7 +362,7 @@ public class ModuleContext extends Context<Module>{
     public Context findImport(Class klass, String id) {
         for(ModuleImportContext mic : imports) {
             Object ctx = mic.getProxy().references.find {
-                it.getProxy().getClass() == klass && it.getProxy().id == id
+                klass.isAssignableFrom( it.getProxy().getClass() ) && it.getProxy().id == id
             }
             if( ctx !=null )
                 return (Context)ctx;
@@ -365,7 +372,7 @@ public class ModuleContext extends Context<Module>{
 
     public Object getElement(Context<?> from, Class klass, String id) {
 
-        println("ModuleContext.getElement ${from} wants {$klass} of id ${id}");
+        log.debug("ModuleContext.getElement ${from} wants {$klass} of id ${id}");
 
         if(klass == Module.class ) {
             // Need to ask the parent for a module.
@@ -374,19 +381,19 @@ public class ModuleContext extends Context<Module>{
             return new ModuleReferenceContext(this, context);
         }
 
-        ProviderContext provider = providers.find { it.getProxy().getClass() == klass && it.getProxy().id == id }
+        ProviderContext provider = providers.find { klass.isAssignableFrom( it.getProxy().getClass() ) && it.getProxy().id == id }
         if( provider != null ) {
             dependencies << new Dependency(from, provider);
             return provider;
         }
 
-        DataSourceContext dataSource = dataSources.find { it.getProxy().getClass() == klass && it.getProxy().id == id }
+        DataSourceContext dataSource = dataSources.find {  klass.isAssignableFrom( it.getProxy().getClass() ) && it.getProxy().id == id }
         if( dataSource != null ) {
             dependencies << new Dependency(from, dataSource);
             return dataSource;
         }
 
-        ResourceContext result = resources.find { it.getProxy().getClass() == klass && it.getProxy().id == id }
+        ResourceContext result = resources.find {  klass.isAssignableFrom( it.getProxy().getClass() ) && it.getProxy().id == id }
         if( result == null ) {
             // Perhaps it was imported in the imports {} section
 
@@ -408,7 +415,7 @@ public class ModuleContext extends Context<Module>{
 
 }
 
-
+@Slf4j
 public class StateContext {
 
     public Context parent;
@@ -454,13 +461,13 @@ public class StateContext {
 // To get a value
     def getProperty(String name) {
 
-        println "     get ${name}? on ${this}"
+        log.trace "     get ${name}? on ${this}"
 
         try {
             State resource = getProxy();
             return resource.getProperty(name);
         } catch (Exception ex) {
-            println "State for resource " + getProxy() + " does not have property " + name;
+            log.error "State for resource " + getProxy() + " does not have property " + name;
             throw ex;
         }
     }
@@ -473,7 +480,7 @@ public class StateContext {
             getProxy().setProperty(name, value);
         }
         catch (Exception ex) {
-            println(
+            log.error(
                     "Error setting state for resource ${getProxy()} property ${name} with value ${value}");
             println ex;
             throw ex;
@@ -491,12 +498,14 @@ public class StateContext {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("parent", parent)
-                .toString();
+        return """\
+StateContext{
+    parent=$parent
+}"""
     }
 }
 
+@Slf4j
 public class DataSourceContext extends Context<DataSource> {
 
     public ModuleContext moduleContext;
@@ -525,7 +534,7 @@ public class DataSourceContext extends Context<DataSource> {
                 return resource.getProperty(name);
             }
         } catch(Exception ex) {
-            println "State for resource " + getProxy() + " does not have property " + name;
+            log.error "State for resource " + getProxy() + " does not have property " + name;
             throw ex;
         }
 
@@ -534,6 +543,7 @@ public class DataSourceContext extends Context<DataSource> {
 
 }
 
+@Slf4j
 public class ResourceContext extends Context<Resource> {
 
     public ModuleContext moduleContext;
@@ -564,7 +574,7 @@ public class ResourceContext extends Context<Resource> {
             Resource resource = getProxy();
             return resource.getState().getProperty(name);
         } catch(Exception ex) {
-            println "State for resource " + getProxy() + " does not have property " + name;
+            log.error "State for resource " + getProxy() + " does not have property " + name;
             throw ex;
         }
     }
