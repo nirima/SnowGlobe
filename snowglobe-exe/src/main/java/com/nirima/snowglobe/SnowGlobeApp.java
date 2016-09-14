@@ -1,5 +1,7 @@
 package com.nirima.snowglobe;
 
+import com.nirima.snowglobe.core.Core;
+
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -21,6 +23,7 @@ public class SnowGlobeApp {
 
 
   public static void main(String[] args) throws IOException {
+
 
     new SnowGlobeApp().doMain(args);
   }
@@ -61,7 +64,7 @@ public class SnowGlobeApp {
 
 
     // access non-option arguments
-    System.out.println("other arguments are:");
+    System.err.println("other arguments are:");
 
     // Initialize
     File f1 = new File("snowglobe.sg");
