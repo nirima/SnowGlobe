@@ -8,12 +8,18 @@ import java.lang.reflect.ParameterizedType
 
 @Slf4j
 public class Core {
-    Map<String, Class> classesMap = [:];
+    Map<String, Class> classesMap;
 
     public static Core INSTANCE  = new Core();
 
 
     private Core() {
+
+    }
+    public void init() {
+
+        log.info "Initializing class map"
+        classesMap = [:];
 
         Reflections reflections = new Reflections("com.nirima.snowglobe");
 
@@ -22,7 +28,10 @@ public class Core {
         annotated.each {
 
             it -> try {
-                classesMap.put(it.getAnnotation(SGItem.class).value(), it)
+                String name = it.getAnnotation(SGItem.class).value();
+                log.info "Seen ${name}"
+
+                classesMap.put(name, it)
             } catch(Exception ex) {
                 ex.printStackTrace();
             }
@@ -32,18 +41,28 @@ public class Core {
     }
 
     public void register(Class c, String name) {
+        if( classesMap == null )
+            init();
         classesMap[name] = c;
     }
 
     public Class getClassForName(String name) {
+        if( classesMap == null )
+            init();
+
         Class aClass =  classesMap.get(name);
-        if( aClass == null )
-            log.error "I don't know what class ${name} is for";
+        if( aClass == null ) {
+            log.debug "I don't know what class ${name} is for";
+
+        }
 
         return aClass;
     }
 
     public String getNameForClass(Class klass) {
+        if( classesMap == null )
+            init();
+
         String name = null;
 
         classesMap.each {
@@ -52,6 +71,12 @@ public class Core {
         }
 
         return name;
+    }
+
+    public void dump() {
+        classesMap.each {
+            println "Defined ${it.key} as ${it.value}"
+        }
     }
 }
 
@@ -166,8 +191,10 @@ public class Module {
         }
 
         items2[0] = this;
-        if( klass == null )
-            throw new ClassNotFoundException("Missing ${name}");
+        if( klass == null ) {
+         //   throw new ClassNotFoundException("Missing ${name}");
+            return parent.invokeMethod(name, args);
+        }
         return klass.newInstance(items2);
     }
 
@@ -187,6 +214,7 @@ public class Module {
     }
 }
 
+@Slf4j
 public class State {
     public Closure closure;
 
@@ -241,6 +269,7 @@ public class ResourceState extends State {
     }
 }
 
+@Slf4j
 abstract public class Resource<T extends ResourceState>
 {
     Module module;
@@ -316,7 +345,7 @@ abstract public class Resource<T extends ResourceState>
 }
 
 
-
+@Slf4j
 public class Provider {
     private Module module;
     String id;

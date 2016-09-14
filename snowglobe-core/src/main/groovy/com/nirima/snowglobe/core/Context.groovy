@@ -3,6 +3,7 @@ import groovy.util.logging.Slf4j
 /**
  * Created by magnayn on 04/09/2016.
  */
+@Slf4j
 abstract class Context<T> {
     private T proxy;
     Context(T t) {
@@ -477,6 +478,10 @@ public class StateContext {
 
         try {
             getProxy().setProperty(name, value);
+        }
+        catch(MissingPropertyException e1) {
+            log.warn(
+                    "Error setting state for resource ${getProxy()} property ${name} with value ${value}");
         }
         catch (Exception ex) {
             log.error(
