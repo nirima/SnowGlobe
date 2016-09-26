@@ -184,6 +184,9 @@ public class ProviderContext extends Context<Provider> {
         try {
             getProxy().setProperty(name,value);
         }
+        catch( MissingPropertyException ex) {
+            log.error("Resource ${getProxy()} does not have a property named ${name}");
+        }
         catch( Exception ex ) {
             log.error ("Error setting state for resource ${getProxy()} property ${name} with value ${value}", ex);
             throw ex;

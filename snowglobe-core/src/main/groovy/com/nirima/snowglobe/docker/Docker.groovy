@@ -58,6 +58,26 @@ class DockerContainerPort {
 class DockerContainerVolume {
     String from_container;
 
+    boolean equals(o) {
+        if (this.is(o)) {
+            return true
+        }
+        if (getClass() != o.class) {
+            return false
+        }
+
+        DockerContainerVolume that = (DockerContainerVolume) o
+
+        if (from_container != that.from_container) {
+            return false
+        }
+
+        return true
+    }
+
+    int hashCode() {
+        return (from_container != null ? from_container.hashCode() : 0)
+    }
 
     @Override
     public String toString() {
@@ -67,7 +87,7 @@ class DockerContainerVolume {
     }
 }
 
-public class DockerContainerState extends ResourceState {
+public class DockerContainerState extends ResourceState implements Comparable<DockerContainerState> {
     public String name;
     public String image;
     public List links;
@@ -123,6 +143,71 @@ public class DockerContainerState extends ResourceState {
                 provider = docker_provider(null);
         }
         return defaults;
+    }
+
+    @Override
+    int compareTo(DockerContainerState o) {
+
+        if (this.is(o)) {
+            return 0
+        }
+        if (getClass() != o.class) {
+            return -1
+        }
+
+        DockerContainerState that = (DockerContainerState) o
+
+        if (must_run != that.must_run) {
+            return -1
+        }
+        if (publish_all_ports != that.publish_all_ports) {
+            return -1
+        }
+        if (command != that.command) {
+            return -1
+        }
+        if (env != that.env) {
+            return -1
+        }
+
+        // Ignore Id as this is the actual container.
+
+        if (image != that.image) {
+            return -1
+        }
+        if (links != that.links) {
+            return -1
+        }
+        if (name != that.name) {
+            return -1
+        }
+        if (ports != that.ports) {
+            return -1
+        }
+        if (restart != that.restart) {
+            return -1
+        }
+        if (volumes != that.volumes) {
+            return -1
+        }
+
+        return 0
+    }
+
+    int hashCode() {
+        int result
+        result = (name != null ? name.hashCode() : 0)
+        result = 31 * result + (image != null ? image.hashCode() : 0)
+        result = 31 * result + (links != null ? links.hashCode() : 0)
+        result = 31 * result + (ports != null ? ports.hashCode() : 0)
+        result = 31 * result + (volumes != null ? volumes.hashCode() : 0)
+        result = 31 * result + (command != null ? command.hashCode() : 0)
+        result = 31 * result + (env != null ? env.hashCode() : 0)
+        result = 31 * result + (restart != null ? restart.hashCode() : 0)
+        result = 31 * result + (publish_all_ports ? 1 : 0)
+        result = 31 * result + (must_run ? 1 : 0)
+        result = 31 * result + (id != null ? id.hashCode() : 0)
+        return result
     }
 }
 

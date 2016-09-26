@@ -6,6 +6,8 @@ import com.github.dockerjava.api.command.CreateContainerResponse
 import com.github.dockerjava.api.exception.NotModifiedException
 import com.github.dockerjava.api.model.*
 import com.nirima.snowglobe.plan.PlanActionBase
+import groovy.util.logging.Slf4j
+import org.slf4j.Logger
 
 /**
  * Created by magnayn on 05/09/2016.
@@ -70,7 +72,7 @@ public class DockerImageAction  extends PlanActionBase<DockerImage,DockerImageSt
 
 
 
-
+@Slf4j
 class DockerContainerAction extends PlanActionBase<DockerContainer,DockerContainerState> {
 
     DockerContainerAction(DockerContainer resource) {
@@ -133,6 +135,23 @@ class DockerContainerAction extends PlanActionBase<DockerContainer,DockerContain
     }
 
     @Override
+    DockerContainerState update(DockerContainerState old, DockerContainerState newState) {
+
+
+        if( old.compareTo(newState) != 0) {
+            log.info "Docker Container requires re-creation"
+            // Delete and recreate
+            delete(old);
+            return create(newState);
+        }
+
+        // Old state will have stuff like IDs in it, so return that if it's deemed
+        // to be the same.
+        return old;
+
+    }
+
+    @Override
     DockerContainerState delete(DockerContainerState dockerContainer) {
         DockerProvider dp = dockerContainer.getProvider();
         DockerClient client = dp.getDockerClient();
@@ -145,7 +164,10 @@ class DockerContainerAction extends PlanActionBase<DockerContainer,DockerContain
         client.removeContainerCmd(dockerContainer.id).exec();
 
         dockerContainer.id = null;
+        return null;
     }
+
+
 
 
 }

@@ -3,7 +3,9 @@ package com.nirima.snowglobe.consul
 import com.nirima.snowglobe.plan.PlanActionBase
 import com.orbitz.consul.Consul
 import com.orbitz.consul.KeyValueClient
+import groovy.util.logging.Slf4j
 
+@Slf4j
 class ConsulKeyPrefixAction extends PlanActionBase<ConsulKeyPrefix, ConsulKeyPrefixState> {
 
 
@@ -21,8 +23,10 @@ class ConsulKeyPrefixAction extends PlanActionBase<ConsulKeyPrefix, ConsulKeyPre
         String prefix = desiredState.path_prefix;
 
         desiredState.subkeys.each {
+
             it ->
                 String key = prefix + it.key;
+                log.debug "Setting consul ${key} = ${it.value}"
                 kvClient.putValue(key, it.value);
         }
 
@@ -32,6 +36,7 @@ class ConsulKeyPrefixAction extends PlanActionBase<ConsulKeyPrefix, ConsulKeyPre
 
 }
 
+@Slf4j
 class ConsulKeysAction extends PlanActionBase<ConsulKeys, ConsulKeysState> {
 
 
@@ -46,11 +51,14 @@ class ConsulKeysAction extends PlanActionBase<ConsulKeys, ConsulKeysState> {
         KeyValueClient kvClient = client.keyValueClient();
 
         desiredState.key.each {
+            log.debug "Setting consul ${it.path} = ${it.value}"
             kvClient.putValue(it.path, it.value);
         }
 
         return desiredState
     }
+
+
 
 
 

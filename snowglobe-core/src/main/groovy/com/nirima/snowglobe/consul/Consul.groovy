@@ -12,6 +12,9 @@ import com.orbitz.consul.Consul
 class ConsulProvider extends Provider {
 
     public String address;
+    public String token;
+    public String scheme;
+    public String datacenter;
 
     ConsulProvider(Module module, String id, Closure closure) {
         super(module, id, closure)
@@ -19,7 +22,7 @@ class ConsulProvider extends Provider {
 
     public Consul getConsulClient() {
 
-        Thread.sleep(1000);
+        Thread.sleep(5000);
 
         Consul consul = Consul.builder()
                 .withHostAndPort(HostAndPort.fromString(address))

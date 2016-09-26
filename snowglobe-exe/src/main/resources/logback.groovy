@@ -5,7 +5,7 @@ import ch.qos.logback.core.ConsoleAppender
 
 import static ch.qos.logback.classic.Level.WARN
 
-def consolePattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+def consolePattern = "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
 
 scan("30 seconds")
 
@@ -26,4 +26,6 @@ appender("STDERR", ConsoleAppender) {
 //logger("log4jdbc.debug", DEBUG, ["STDOUT"], false)
 //logger("jdbc.audit", DEBUG, ["STDOUT"], false)
 
-root(WARN, ["STDERR"])
+logger("com.nirima", INFO, ["STDERR"])
+
+root(DEBUG)
