@@ -6,5 +6,7 @@ package com.nirima.snowglobe;
 public enum Action {
   apply,
   graph,
-  destroy
+  destroy;
+
+  public static final Action[] ACTIONS = new Action[] {apply, graph, destroy};
 }
