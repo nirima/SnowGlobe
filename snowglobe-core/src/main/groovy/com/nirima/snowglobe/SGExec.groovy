@@ -71,21 +71,21 @@ class SGExec {
 
 
         if( stateFile != null ) {
-             dsl.parseScript(stateFile);
-             stateGlobe = dsl.runScript();
+             SnowGlobeSystem dslState = new SnowGlobeSystem();
 
-            //SnowGlobeContext sctxt = dsl.getState(stateGlobe);
-            SnowGlobeContext stContext = new SnowGlobeContext(stateGlobe);
+             dslState.parseScript(stateFile);
+             stateGlobe = dslState.runScript();
 
-            stContext.initModules();
+            if( stateGlobe != null ) {
+                SnowGlobeContext stContext = new SnowGlobeContext(stateGlobe);
 
-            // Don't init it.
+                stContext.initModules();
 
-            mergeState(snowGlobe, stateGlobe);
+                // Don't init it.
 
+                mergeState(snowGlobe, stateGlobe);
+            }
         }
-
-
 
         sgContext.buildModules();
 

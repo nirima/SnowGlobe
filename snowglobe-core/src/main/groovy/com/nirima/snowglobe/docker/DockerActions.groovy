@@ -5,6 +5,7 @@ import com.github.dockerjava.api.command.CreateContainerCmd
 import com.github.dockerjava.api.command.CreateContainerResponse
 import com.github.dockerjava.api.exception.NotModifiedException
 import com.github.dockerjava.api.model.*
+import com.google.common.base.Strings
 import com.nirima.snowglobe.plan.PlanActionBase
 import groovy.util.logging.Slf4j
 import org.slf4j.Logger
@@ -100,6 +101,10 @@ class DockerContainerAction extends PlanActionBase<DockerContainer,DockerContain
         if (desiredState.command != null)
             create.withCmd(desiredState.command);
 
+        if( !Strings.isNullOrEmpty(desiredState.restart) ) {
+            RestartPolicy restartPolicy = RestartPolicy.parse(desiredState.restart);
+            create.withRestartPolicy(restartPolicy);
+        }
 
         if (desiredState.name != null) {
             create.withName(desiredState.name);
