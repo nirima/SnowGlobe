@@ -61,7 +61,13 @@ public class SnowGlobeApp {
       return;
     }
 
-
+    if (action == null) {
+      System.out.println("\nSnowglobe actions are:");
+      for (Action a: Action.ACTIONS) {
+         System.out.println(String.format("  - %s", a.toString()));
+         } 
+         return;
+      }
 
     // access non-option arguments
     System.err.println("other arguments are:");
