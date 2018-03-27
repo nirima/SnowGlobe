@@ -2,10 +2,6 @@ node {
   stage name:"Checkout"
   checkout scm;
 
-  // No longer required
-  //stage name:"Dependencies"
-  //buildTempDeps()
-
   stage name:"Build"
   build()
 
@@ -28,7 +24,8 @@ def publishDocker() {
       // Prepare
       sh './prod/build.sh';
 
-      String tags = "dev.nirima.com/snowglobe:${env.BUILD_NUMBER}";
+      //String tags = "nirima/snowglobe:${env.BUILD_NUMBER}";
+      String tags = "nirima/snowglobe:latest";
 
       def image = docker.build(tags, "-f prod/Dockerfile prod");
 
@@ -36,19 +33,6 @@ def publishDocker() {
 }
 
 
-def buildTempDeps() {
-	// Temporary dependencies to things that have not yet been fixed
-	dir('docker-java') {
-        
-		git url: "https://github.com/magnayn/docker-java.git"
-
-		def mvnHome = tool 'latest'
-		env.MAVEN_OPTS="-Xmx2G";
-
-		sh "${mvnHome}/bin/mvn -DskipTests clean install"
-	}
-
-}
 
 void withJavaEnv(List envVars = [], def body) {
     String npmTool = tool name: 'Node', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'

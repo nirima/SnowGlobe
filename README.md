@@ -29,6 +29,9 @@ Running the docker image:
 
 * Use a volume so stored globes & state survive.
 
+```bash
+
 docker run -dtiP -v /Users/store/.snowglobe:/var/snowglobe -v /var/run/docker.sock:/var/run/docker.sock nirima/snowglobe
+```
 
 [docs](./docs/index.md) 
