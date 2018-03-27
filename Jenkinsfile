@@ -29,7 +29,9 @@ def publishDocker() {
 
       def image = docker.build(tags, "-f prod/Dockerfile prod");
 
-      image.push();
+      withDockerRegistry([ credentialsId: "docker_hub", url: "" ]) {
+        image.push();
+      }
 }
 
 
