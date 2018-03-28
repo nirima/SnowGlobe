@@ -30,7 +30,7 @@ import * as moment from 'moment';
                  }
                  
                  .snowglobe-header-image {
-                   background-image: url('/assets/images/snowglobe.png');
+                   background-image: url('../assets/images/snowglobe.png');
                    background-size: cover;
                  }
                  

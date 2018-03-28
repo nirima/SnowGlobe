@@ -131,6 +131,23 @@ export class GlobeService {
       }).toPromise();
   }
 
+  async getJSONState(id: string):Promise<any> {
+    let url = `${this.getBaseURL()}/globe/${id}/state`;
+    console.log("fetch " + url);
+
+    let headers = new Headers();
+    headers.append('Accept', "application/json");
+    let opts = new RequestOptions();
+    opts.headers = headers;
+
+
+    return this.http.get(url, opts)
+      .map( (responseData) => {
+        console.log('Incoming' +responseData);
+        return JSON.parse(responseData.text());
+      }).toPromise();
+  }
+
   getSites() {
     let url = `${this.getBaseURL()}/customers`;
     console.log("fetch " + url);

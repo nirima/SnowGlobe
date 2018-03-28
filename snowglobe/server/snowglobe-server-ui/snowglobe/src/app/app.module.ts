@@ -16,7 +16,8 @@ import {CodemirrorModule} from "ng2-codemirror";
 import {MatTabsModule} from '@angular/material/tabs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
-  MAT_PLACEHOLDER_GLOBAL_OPTIONS, MatButton, MatButtonModule, MatCardModule,
+  MAT_PLACEHOLDER_GLOBAL_OPTIONS, MatButton, MatButtonModule, MatCardModule, MatCheckbox,
+  MatCheckboxModule,
   MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatOptionModule,
   MatProgressBarModule,
   MatProgressSpinner,
@@ -53,6 +54,7 @@ import {DialogDelete} from "../pages/globe.page";
     MatCardModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
+    MatCheckboxModule,
     AppNavBarModule,
     RouterModule.forRoot([
                            {

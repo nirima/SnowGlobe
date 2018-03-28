@@ -107,6 +107,14 @@ import {DialogNewSnowglobe} from "./home.page";
                    </div>
 
                  </mat-tab>
+                 <mat-tab label="Docker">
+                   <div *ngFor="let cinfo of containerInfoState">
+                     <H1>Container {{cinfo['containerId']}}</H1>
+                     <div *ngFor="let n of cinfo.net">
+                       {{n.ip}}:{{n.port}} --> {{n.hostIp}}:{{n.hostPort}}
+                     </div>
+                   </div>
+                 </mat-tab>
                  <mat-tab label="Graph">
                    <img [src]="imgUrl">
                  </mat-tab>
@@ -140,6 +148,7 @@ export class GlobePage {
   files:Array<EditorItem> = [];
 
   state:string;
+  jsonState:any;
   imgUrl:string;
 
   processing:boolean = false;
@@ -176,6 +185,80 @@ export class GlobePage {
 
   get selectedFile(): EditorItem {
     return this._selectedFile;
+  }
+
+  get containerInfoState():Array<any> {
+    let dv = [];
+
+    if( this.jsonState == null )
+      return dv;
+
+    let m:Map<string, any> = this.jsonState.modules;
+
+   try {
+     for (const key in m) {
+
+
+       let mi = m[key]["resources"]["docker_container_info"];
+       for (const ciName in mi) {
+
+         let thisData =  { "net": [], "containerId": 'tbd' };
+
+         dv = dv.concat( thisData);
+
+
+         let dockerInfo = mi[ciName];
+         console.log(dockerInfo);
+
+         thisData['containerId'] = dockerInfo['items']['container_id'];
+
+         let networkSettings =  dockerInfo['items']['info']['NetworkSettings'];
+         let thePorts = networkSettings['Ports'];
+         console.log(thePorts);
+         for( const portName in thePorts) {
+          let mapping = thePorts[portName][0];
+
+          let data = {
+            "ip": networkSettings['IPAddress'],
+            "port": portName,
+            "hostIp": mapping["HostIp"],
+            "hostPort": mapping["HostPort"]
+
+          };
+
+          console.log(data);
+           thisData.net = thisData.net.concat(data);
+         }
+
+
+       }
+       //['info']['NetworkSettings']['IPAddress'];
+       //
+       // ['NetworkSettings']['IPAddress'];
+       // for(const moduleName in m[key] ) {
+       //   console.log(m[key]);
+       //   let module:Map<string,any> = m[key][moduleName];
+       //   console.log(module);
+       //   let resources:Map<string,any> = module["resources"];
+       //   console.log(resources);
+       //   let ci:Map<string,any> = resources["docker_container_info"];
+       //
+       //   if (ci != null ) {
+       //     for( const ciName in ci ) {
+       //       console.log(ciName);
+       //     }
+       //   }
+
+     }
+   } catch(e) {
+     // Don't care, just carry on
+
+   }
+
+
+
+
+    return dv;
   }
 
   set selectedFile(value: EditorItem) {
@@ -301,6 +384,7 @@ export class GlobePage {
 
 
     this.state = await this.globeService.getState(this.id);
+    this.jsonState = await this.globeService.getJSONState(this.id);
     //this.state = "FOO";
     this.imgUrl = `${this.appConfig.baseUrl}/data/globe/${this.id}/graph?seq=` + new Date().getMilliseconds();
 
@@ -320,8 +404,17 @@ export class GlobePage {
       dialogRef.afterClosed().subscribe(result => {
         console.log('The dialog was closed ' + result);
         this.processing = false;
+
+
+
         this.refresh();
         console.log("Destroy done");
+
+        // Also removed?
+        if( result ) {
+          this.router.navigate(['/']);
+        }
+
       });
 
     } catch(e) {
@@ -543,6 +636,11 @@ export class DialogClone {
 
              <div mat-dialog-content>
 
+               <section>
+                 <mat-checkbox [(ngModel)]="checked">Remove SnowGlobe after destroy?</mat-checkbox>
+         
+               </section>
+               
                <div *ngIf="complete">
                  <h2>Response:</h2>
                  <!--<mat-progress-spinner *ngIf="processing" mode="indeterminate"></mat-progress-spinner>-->
@@ -563,6 +661,9 @@ export class DialogClone {
              `,
            })
 export class DialogDestroy {
+
+  checked = true;
+
   processing:boolean = false;
   complete:boolean = false;
   response:string;
@@ -578,6 +679,9 @@ export class DialogDestroy {
     try {
       this.processing = true;
       this.response = await this.globeService.destroy(id);
+      if( this.checked ) {
+        await this.globeService.delete(id);
+      }
       this.processing = false;
     } catch(e) {
       this.processing = false;
@@ -594,7 +698,7 @@ export class DialogDestroy {
   }
 
   onNoClick(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(this.complete && this.checked);
   }
 
 }
