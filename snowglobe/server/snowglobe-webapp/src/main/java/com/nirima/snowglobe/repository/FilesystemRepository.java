@@ -11,9 +11,11 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class FilesystemRepository implements IRepository {
   final File root;
@@ -29,7 +31,8 @@ public class FilesystemRepository implements IRepository {
   }
 
   public Collection<Globe> list() {
-    return list("", root);
+    return list("", root).stream().sorted(
+        Comparator.comparing(o -> o.id)).collect(Collectors.toList());
   }
 
   protected File getRepositoryRoot() {
