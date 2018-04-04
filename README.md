@@ -5,7 +5,12 @@ Infrastructure as Code
 
 SnowGlobe is a tool in the same area as Terraform, Cloudformation, docker-compose.
 
-SnowGlobe is currently very experimental. It is useful for us in our deployment scenarios!
+You may think of it as "docker-compose on steroids", or alternately "terraform with added DSL goodness"!
+
+
+SnowGlobe is pre-v1.0, so expect changes to be in progress. Assistance and pull requests are always welcome.
+
+## What it does
 
 These tools aim to allow you to 'describe' how infrastructure is to be deployed, and allow incremental changes to be made. Instead of writing scripts that perform steps, your configuration defines what you want the outcome to look like, and the tooling figures out the necessary steps needed to make it work.
 
@@ -23,7 +28,9 @@ It is very similar to (and deeply inspired by) Terraform - but with some differe
 
 * Terraform is much more mature and has more effort applied to it.
 
-## Docker Image
+## Getting Stareted
+
+### Docker Image
 
 Running the docker image:
 
@@ -34,4 +41,8 @@ Running the docker image:
 docker run -dtiP -v /Users/store/.snowglobe:/var/snowglobe -v /var/run/docker.sock:/var/run/docker.sock nirima/snowglobe
 ```
 
-[docs](./docs/index.md) 
+### Further Documentation:
+
+[Documentation Index](./docs/index.md)
+
+ 
