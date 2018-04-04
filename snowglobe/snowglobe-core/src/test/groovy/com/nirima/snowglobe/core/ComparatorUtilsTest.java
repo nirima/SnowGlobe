@@ -15,10 +15,11 @@ public class ComparatorUtilsTest {
     DockerContainerState two = new DockerContainerState(null,null);
 
     assertEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    assertEquals( one.compareTo(two), 0);
 
     one.name = "foo bar";
     assertNotEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
-
+    assertNotEquals( one.compareTo(two), 0);
   }
 
   @Test
@@ -32,6 +33,7 @@ public class ComparatorUtilsTest {
     two.setExternal(5678);
     
     assertEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    assertEquals( one.compareTo(two), 0);
 
 
   }
@@ -42,6 +44,8 @@ public class ComparatorUtilsTest {
     DockerContainerState two = new DockerContainerState(null,null);
 
     assertEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    assertEquals( one.compareTo(two), 0);
+
 
     DockerContainerPort p = new DockerContainerPort();
     p.setInternal(1234);
@@ -50,6 +54,8 @@ public class ComparatorUtilsTest {
 
     one.ports.add(p);
     assertNotEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    assertNotEquals( one.compareTo(two), 0);
+
 
     DockerContainerPort p2 = new DockerContainerPort();
     p2.setInternal(1234);
@@ -58,6 +64,7 @@ public class ComparatorUtilsTest {
     two.ports.add(p2);
 
     assertEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    assertEquals( one.compareTo(two), 0);
 
 
 

@@ -16,16 +16,26 @@ import com.nirima.snowglobe.core.*
 import com.nirima.snowglobe.plan.PlanAction
 import com.nirima.snowglobe.utils.ThreadLog
 import com.nirima.snowglobe.utils.ThreadLogBase
+import com.sun.jmx.snmp.IPAcl.Host
 import groovy.util.logging.Slf4j
 import org.apache.commons.lang.ObjectUtils
+import sun.nio.ch.Net
 
 /**
  * Created by magnayn on 04/09/2016.
  */
 
-class DockerContainerPort {
-    int internal;
-    int external;
+class DockerContainerPort implements Comparable {
+
+    /**
+     * Port inside the container
+     */
+    public int internal;
+
+    /**
+     * Port to map to externally
+     */
+    public int external;
 
     @Override
     public String toString() {
@@ -55,29 +65,72 @@ class DockerContainerPort {
         return true
     }
 
+    int compareTo(Object o) {
+        return ComparatorUtils.fieldwiseCompare(this, o);
+    }
+
     int hashCode() {
         int result
         result = internal
         result = 31 * result + external
         return result
     }
+
+    int getInternal() {
+        return internal
+    }
+
+    void setInternal(int internal) {
+        this.internal = internal
+    }
+
+    int getExternal() {
+        return external
+    }
+
+    void setExternal(int external) {
+        this.external = external
+    }
 }
 
-class DockerContainerHost {
-    String host;
-    String ip;
+class DockerContainerHost implements Comparable {
+    public String host;
+    public String ip;
+    int compareTo(Object o) {
+        return ComparatorUtils.fieldwiseCompare(this, o);
+    }
+
 }
 
-class DockerContainerVolume {
-    String from_container;
+/**
+ * Represent a container volume mapping.
+ */
+class DockerContainerVolume implements Comparable{
 
-    String host_path;
+    /**
+     * Which container to map the volume from. Not neccessary if using a host_path
+     */
+    public String from_container;
 
-    String volume_name;
+    /**
+     * Map from a host path
+     */
+    public String host_path;
 
-    String container_path;
+    /**
+     * Map from a named volume
+     */
+    public String volume_name;
 
-    boolean read_only = false;
+    /**
+     * Where to map the data to in the container
+     */
+    public String container_path;
+
+    /**
+     * Should the mapping be read-only?
+     */
+    public boolean read_only = false;
 
     boolean equals(o) {
         if (this.is(o)) {
@@ -124,10 +177,14 @@ class DockerContainerVolume {
                 .add("from_container", from_container)
                 .toString();
     }
+
+    int compareTo(Object o) {
+        return ComparatorUtils.fieldwiseCompare(this, o);
+    }
 }
 
 
-public class DockerContainerInfoState extends ResourceState implements Comparable<DockerContainerInfoState> {
+public class DockerContainerInfoState extends ResourceState {
     public JsonNode info;
     public String container_id;
 
@@ -136,10 +193,7 @@ public class DockerContainerInfoState extends ResourceState implements Comparabl
         super(parent, closure)
     }
 
-    @Override
-    int compareTo(DockerContainerInfoState o) {
-        return 0
-    }
+
 
     @JsonIgnore
     Closure getDefaults() {
@@ -151,29 +205,84 @@ public class DockerContainerInfoState extends ResourceState implements Comparabl
     }
 }
 
-public class DockerContainerState extends ResourceState implements Comparable<DockerContainerState> {
+public class DockerContainerState extends ResourceState implements Comparable {
 
-
+    /**
+     * Name for this container.
+     */
     public String name;
+
+    /**
+     * Image to use for this container.
+     */
     public String image;
+
+    /**
+     * List of container links, of the format source:target.
+     * E.g:
+     *
+     * ```
+     * links = ["postgres:pg_container"]
+     * ```
+     *
+     * Note that you may wish the target to be a container *ID* so that if it changes then this
+     * container is also correctly re-created. E.g:
+     * ```
+     * links = ["postgres:docker_container('pg_container').id"]
+     * ```
+     */
     public List links;
 
+    /**
+     * List of ports to map.
+     * E.g:
+     * ```
+     * ports { internal: 123
+     *         external: 123
+     *        }
+     * ```
+     */
     public List<DockerContainerPort> ports = [];
+
+    /**
+     * Data volumes / host directory mappings to place into the container
+     */
     public List<DockerContainerVolume> volumes = [];
+
+    /**
+     * Hosts to add to the container DNS
+     */
     public List<DockerContainerHost> host = [];
+
+    /**
+     * Array of parameters to pass as the command for the container.
+     */
     public List command;
     public List env;
 
     public Map<String,String> labels = [:];
 
+    /**
+     * Restart strategy ('always', 'on-failure', 'unless-stopped')
+     */
     public String restart;
 
+    /**
+     * Publish all exported ports
+     */
     public boolean publish_all_ports;
+
     public boolean must_run = true;
 
-    // Net, Host, etc
+    /**
+     * Net, Host, etc
+      */
+
     public String network_mode;
 
+    /**
+     * List of capabilities to expose
+     */
     public List<String> capabilities;
 
     public boolean tty = false;
@@ -232,10 +341,7 @@ public class DockerContainerState extends ResourceState implements Comparable<Do
         return defaults;
     }
 
-    @Override
-    int compareTo(DockerContainerState o) {
-        return ComparatorUtils.fieldwiseCompare(this, o);
-    }
+
 
     int hashCode() {
         int result
@@ -273,6 +379,9 @@ DockerContainerState{
     }
 }
 
+/**
+ * Represents a docker container.
+ */
 @SGItem("docker_container")
 public class DockerContainer extends Resource<DockerContainerState> {
 
@@ -288,6 +397,11 @@ public class DockerContainer extends Resource<DockerContainerState> {
 
 }
 
+/**
+ * Persist into state information about the docker container (obtained by running docker-inspect).
+ *
+ * Useful so that down-stream consumers may understand the state of the system.
+ */
 @SGItem("docker_container_info")
 public class DockerContainerInfo extends Resource<DockerContainerInfoState> {
 
@@ -305,14 +419,19 @@ public class DockerContainerInfo extends Resource<DockerContainerInfoState> {
 
 
 public class DockerImageState extends ResourceState {
-    String name;
 
-    String latest;
+    public String name;
 
-    String imageId;
+    public String latest;
 
-    boolean keep_locally;
+    public String imageId;
 
+    public boolean keep_locally;
+
+    /**
+     * Which registry provider to use (defaults to the docker hub, or
+     * by finding a provider with the same name as the base of the image)
+     */
     @JsonIgnore
     public Object registry_provider;
 
@@ -348,6 +467,9 @@ public class DockerImageState extends ResourceState {
     }
 }
 
+/**
+ * Represents a docker image on the local disk.
+ */
 @SGItem("docker_image")
 public class DockerImage extends Resource<DockerImageState> {
 
@@ -395,7 +517,9 @@ public class PullLogger extends PullImageResultCallback {
     }
 }
 
-
+/**
+ * Represents a docker image present in a remote registry.
+ */
 @Slf4j
 @SGItem("docker_registry_image")
 public class DockerRegistryImage extends DataSource<DockerRegistryImageState> {
@@ -478,9 +602,9 @@ public class DockerRegistryImage extends DataSource<DockerRegistryImageState> {
 }
 
 public class DockerRegistryImageState extends DataSourceState {
-    String name;
+    public String name;
 
-    Object registry;
+    public Object registry;
 
     DockerRegistryImageState(DataSource parent, Closure closure) {
         super(parent, closure)
@@ -515,9 +639,23 @@ public class DockerRegistryImageState extends DataSourceState {
 //    }
 }
 
+/**
+ * Docker provider : the communications channel with Docker.
+ */
 @SGItem("docker_provider")
 public class DockerProvider extends Provider {
+    /**
+     * Host. E.g:
+     *
+     * ```
+     * host = "tcp://my.site:2376"
+     * ```
+     */
     public String host;
+
+    /**
+     * If using SSL, where to get certificates from on the local path
+     */
     public String cert_path;
 
     public String key;
@@ -549,10 +687,18 @@ public class DockerProvider extends Provider {
     }
 }
 
-
+/**
+ * Represent a remote docker registry.
+ */
 @SGItem("docker_registry")
 public class DockerRegistry extends Provider {
+    /**
+     * Username to access the registry with
+     */
     public String username;
+    /**
+     * Password to access the registry with
+     */
     public String password;
 
     DockerRegistry(Module module, String id, Closure closure) {

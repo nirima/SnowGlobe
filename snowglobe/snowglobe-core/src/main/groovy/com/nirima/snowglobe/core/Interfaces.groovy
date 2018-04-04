@@ -39,6 +39,9 @@ public interface IProvider extends IModuleElement {
 
 }
 
+/**
+ * NoCompare fields should not be considererd when looking at state to see if there is a change.
+ */
 @Target(value = [ElementType.FIELD] )
 @Retention(RUNTIME)
 public @interface NoCompare

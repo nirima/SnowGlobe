@@ -3,6 +3,7 @@ package com.nirima.snowglobe.core
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.nirima.snowglobe.docker.DockerContainerState
 import com.nirima.snowglobe.plan.PlanAction
 import com.nirima.snowglobe.repository.IRepository
 import com.nirima.snowglobe.repository.IRepositoryModule
@@ -431,7 +432,7 @@ public class Module {
 }
 
 @Slf4j
-public class State {
+public class State implements Comparable {
 
     @JsonIgnore
     public Closure closure;
@@ -466,6 +467,12 @@ public class State {
             log.error("Error evaluating in ${this} CTX= ${context}", ex);
             throw new RuntimeException("Error evaluating in ${this} CTX= ${context}", ex);
         }
+    }
+
+
+
+    int compareTo(Object o) {
+        return ComparatorUtils.fieldwiseCompare(this, o);
     }
 
     /*
@@ -620,7 +627,7 @@ public class Provider {
     }
 }
 
-public class DataSource<T extends DataSourceState> extends Provider {
+public abstract class DataSource<T extends DataSourceState> extends Provider {
 
     T state;
 
