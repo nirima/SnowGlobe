@@ -22,8 +22,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.Properties;
-import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
@@ -80,6 +78,24 @@ public class GlobeResource {
     return globeManager.forGlobe(id).details();
   }
 
+
+  @Path("/globe/{id}/vars")
+  @GET
+  @Produces("text/plain")
+  public String getGlobeVars(@PathParam("id") String id) throws IOException {
+    SGParameters parameters = globeManager.forGlobe(id).getVariables();
+    return writeParameters(parameters);
+  }
+
+  @Path("/globe/{id}/vars")
+  @PUT
+  @Produces("text/plain")
+  public void setGlobeVars(@PathParam("id") String id, String body) throws IOException {
+    SGParameters parameters = makeParameters(body);
+    globeManager.forGlobe(id).setVariables(parameters);
+  }
+
+
   /**
    * Read/Write the config
    **/
@@ -125,12 +141,12 @@ public class GlobeResource {
   @Path("/globe/{id}/apply")
   @POST
   @Produces("application/json")
-  public String apply(@PathParam("id") String id, @QueryParam("async") boolean async, String body)
+  public String apply(@PathParam("id") String id, @QueryParam("async") String async, String body)
       throws IOException, GlobeException {
 
     SGParameters parameters = makeParameters(body);
-    if (async) {
-      return applyAsync(id, parameters);
+    if (async != null) {
+      return applyAsync(id, parameters, async);
     } else {
       return applySync(id, parameters);
     }
@@ -165,43 +181,54 @@ public class GlobeResource {
   }
 
   private SGParameters makeParameters(String body) throws IOException {
-    Properties properties = new Properties();
-    properties.load(new ByteArrayInputStream(body.getBytes()));
-    SGParameters sgp = new SGParameters(properties);
+    SGParameters sgp = new SGParameters();
+
+    sgp.load(new ByteArrayInputStream(body.getBytes()));
+
     return sgp;
   }
 
-  private String applyAsync(String id, SGParameters parameters) {
+  private String writeParameters(SGParameters parameters) throws IOException {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    parameters.save(byteArrayOutputStream);
+    byteArrayOutputStream.close();
+    return byteArrayOutputStream.toString("UTF-8");
+  }
+
+  private String applyAsync(String id, SGParameters parameters, String topic) {
 
     // ASYNC
     SGExec exec = globeManager.forGlobe(id).getSGExec(parameters);
 
-    final String topic = UUID.randomUUID().toString();
-
-    Runnable r = new Runnable() {
-      public void run() {
+    Runnable r = () -> {
+      ProgressManager.Entry entry = progressManager.getEntry(topic);
+      try {
 
         try {
-          ProgressManager.Entry entry = progressManager.getEntry(topic);
+          entry.sendString("[[Starting]]");
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+        ThreadLog.set(new TopicLogger(entry)).start();
+
+        exec.apply();
+      } finally {
+        String output = exec.save();
+
+        try {
+          globeManager.forGlobe(id).setState(output);
+          entry.sendString("[[Completed OK]]");
+        } catch (IOException e) {
+          e.printStackTrace();
 
           try {
-            entry.session.getRemote().sendString("--WAKA WAKA--");
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-
-          ThreadLog.set(new TopicLogger(entry)).start();
-
-          exec.apply();
-        } finally {
-          String output = exec.save();
-
-          try {
-            globeManager.forGlobe(id).setState(output);
-          } catch (IOException e) {
-            e.printStackTrace();
+            entry.sendString("[[Completed /Exception/]]");
+          } catch (Exception ex) {
           }
         }
+
+        progressManager.closeEntry(topic);
       }
     };
 

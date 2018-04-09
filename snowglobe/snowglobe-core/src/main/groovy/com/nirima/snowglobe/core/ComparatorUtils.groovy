@@ -1,5 +1,8 @@
 package com.nirima.snowglobe.core
 
+import groovy.util.logging.Slf4j
+
+@Slf4j
 class ComparatorUtils {
 
     static int fieldwiseCompare(Object a, Object b) {
@@ -52,15 +55,15 @@ class ComparatorUtils {
                         return -1;
                 }
 
-                println("don't know how to compare " + it);
+                log.error("don't know how to compare {}" ,it);
 
                 return 0;
 
         };
 
-        
-        println "Compare " + list1;
-        println "------- " + list;
+
+        log.debug "Compare " + list1;
+        log.debug "------- " + list;
 
 
         def x = list.find {

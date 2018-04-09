@@ -11,6 +11,7 @@ export class ProgressService {
   private connected = false;
 
   public onMessage = new Subject<any>();
+  public onClosed = new Subject<any>();
 
   constructor(public appConfig:AppConfig){
     console.log(`Creating ProgressService ${appConfig}`);
@@ -23,10 +24,9 @@ export class ProgressService {
     if( this.connected )
       return Promise.resolve(true);
 
-    const wsx = new WebSocket("ws://localhost:8808/progress");
+    const wsx = new WebSocket(`ws://localhost:8808/progress?topic=${topic}`);
 
     this.ws = wsx;
-    console.log("" + this.onMessage );
 
 
     var om = this;
@@ -48,7 +48,8 @@ export class ProgressService {
     };
 
       wsx.onclose = function () {
-      om.connected = false;
+        om.onClosed.next();
+        om.connected = false;
 
     }  ;
       wsx.onerror = function (err) {

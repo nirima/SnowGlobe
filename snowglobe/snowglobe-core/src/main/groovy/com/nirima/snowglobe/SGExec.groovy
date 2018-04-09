@@ -15,6 +15,9 @@ import java.lang.reflect.Modifier
 import java.security.AccessController
 import java.security.PrivilegedAction
 
+/**
+ * Parameters : some key-value pairs that can get used in the execution
+ */
 public class SGParameters {
 
     public Map itemMap = [:];
@@ -30,6 +33,18 @@ public class SGParameters {
             return itemMap.get(name);
 
         return System.getProperty(name);
+    }
+
+    def save(OutputStream os) {
+        Properties properties1 = new Properties();
+        properties1.putAll(this.itemMap);
+        properties1.store(os, "Saved");
+    }
+
+    def load(InputStream inputStream) {
+        Properties properties1 = new Properties();
+        properties1.load(inputStream);
+        this.itemMap = properties1;
     }
 }
 

@@ -48,6 +48,17 @@ export class GlobeService {
       }).toPromise();
   }
 
+  async applyAsync(id:string, settings:string, topic:string):Promise<string> {
+    let url = `${this.getBaseURL()}/globe/${id}/apply?async=${topic}`;
+    console.log("apply " + url);
+
+    return this.http.post(url,settings)
+      .map( (responseData) => {
+        console.log('Incoming' +responseData);
+        return responseData.text();
+      }).toPromise();
+  }
+
   async validate(id:string) {
     let url = `${this.getBaseURL()}/globe/${id}/validate`;
 
@@ -97,10 +108,7 @@ export class GlobeService {
     return this.http.put(url, config).toPromise();
   }
 
-  async saveState(id:string, state:string) {
-    let url = `${this.getBaseURL()}/globe/${id}/state`;
-    return this.http.put(url, state).toPromise();
-  }
+
 
   async create(id:string) {
     let url = `${this.getBaseURL()}/globe/${id}/create`;
@@ -130,6 +138,35 @@ export class GlobeService {
         return responseData.text();
       }).toPromise();
   }
+
+  async saveState(id:string, state:string) {
+    let url = `${this.getBaseURL()}/globe/${id}/state`;
+    return this.http.put(url, state).toPromise();
+  }
+
+  async getVars(id: string):Promise<any> {
+    let url = `${this.getBaseURL()}/globe/${id}/vars`;
+    console.log("fetch " + url);
+
+    let headers = new Headers();
+    headers.append('Accept', "text/plain");
+    let opts = new RequestOptions();
+    opts.headers = headers;
+
+
+    return this.http.get(url, opts)
+      .map( (responseData) => {
+        console.log('Incoming' +responseData);
+        return responseData.text();
+      }).toPromise();
+  }
+
+  async saveVars(id:string, state:string) {
+    let url = `${this.getBaseURL()}/globe/${id}/vars`;
+    return this.http.put(url, state).toPromise();
+  }
+
+
 
   async getJSONState(id: string):Promise<any> {
     let url = `${this.getBaseURL()}/globe/${id}/state`;

@@ -12,6 +12,9 @@ import com.nirima.snowglobe.web.data.Globe;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
@@ -50,6 +53,21 @@ public class GlobeProcessor implements IRepositoryModule {
       globe.lastUpdate = new Date(f.lastModified());
 
     return globe;
+  }
+
+  @Override
+  public SGParameters getVariables() throws IOException {
+    SGParameters parameters = new SGParameters();
+    File f = new File(getRepositoryRoot(), id + "/snowglobe.vars");
+    if( f.exists() )
+      parameters.load( new FileInputStream(f));
+    return parameters;
+  }
+
+  @Override
+  public void setVariables(SGParameters parameters) throws FileNotFoundException {
+    File f = new File(getRepositoryRoot(), id + "/snowglobe.vars");
+    parameters.save( new FileOutputStream(f));
   }
 
   @Override

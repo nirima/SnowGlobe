@@ -10,6 +10,7 @@ import 'codemirror/mode/groovy/groovy'
 import {AppConfig} from "../services/appConfig";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
 import {DialogNewSnowglobe} from "./home.page";
+import {ProgressService} from "../services/progress.service";
 
 @Component({
              template: `
@@ -95,7 +96,17 @@ import {DialogNewSnowglobe} from "./home.page";
                     
                   </div>
                 </mat-tab>
+                 <mat-tab label="Variables">
+                   <codemirror #cmstate [(ngModel)]="vars"  [config]="config">
 
+                   </codemirror>
+
+                   <div class="button-row">
+
+                     <button  [disabled]="processing" mat-button mat-raised-button color="primary" (click)="saveVars()">Save</button>
+                   </div>
+
+                 </mat-tab>
                  <mat-tab label="State">
                    <codemirror #cmstate [(ngModel)]="state"  [config]="config">
 
@@ -148,6 +159,7 @@ export class GlobePage {
   files:Array<EditorItem> = [];
 
   state:string;
+  vars:string;
   jsonState:any;
   imgUrl:string;
 
@@ -311,6 +323,21 @@ export class GlobePage {
     this.processing = false;
   }
 
+  async saveVars() {
+    try {
+      this.processing = true;
+
+      await this.globeService.saveVars(this.id, this.vars);
+      await this.refresh();
+    } catch(e) {
+      this.error = e;
+
+      console.log(e) ;
+    }
+    this.processing = false;
+  }
+
+
   async validate() {
     console.log("Validate");
     try {
@@ -384,6 +411,8 @@ export class GlobePage {
 
 
     this.state = await this.globeService.getState(this.id);
+    this.vars = await this.globeService.getVars(this.id);
+
     this.jsonState = await this.globeService.getJSONState(this.id);
     //this.state = "FOO";
     this.imgUrl = `${this.appConfig.baseUrl}/data/globe/${this.id}/graph?seq=` + new Date().getMilliseconds();
@@ -514,7 +543,7 @@ class EditorItem {
 
                </div>
                
-               <div *ngIf="complete">
+               <div *ngIf="complete || processing">
                 <h2>Response:</h2>
                <!--<mat-progress-spinner *ngIf="processing" mode="indeterminate"></mat-progress-spinner>-->
                <codemirror  *ngIf="response != null" [ngModel]="response"  [config]="config">
@@ -543,11 +572,42 @@ export class DialogApply {
    complete:boolean = false;
 
   constructor(
-    public dialogRef: MatDialogRef<DialogApply>, public globeService:GlobeService,
+    public dialogRef: MatDialogRef<DialogApply>, public globeService:GlobeService, public progress:ProgressService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   async process(id) {
+    // async
+    try {
+      let topic = "ASDFGHJKL";
+
+      await this.progress.connect(topic);
+      this.progress.onMessage.asObservable().subscribe( x => {
+        this.response += x;
+
+      });
+
+
+
+      this.processing = true;
+
+
+      await this.globeService.applyAsync(id, this.settings, topic);
+
+      this.progress.onClosed.asObservable().subscribe( () => {
+        this.processing = false;
+        this.complete = true;
+      })
+
+    } catch(e) {
+      this.response = "Error: " + e._body;
+      console.log(e);
+    }
+
+  }
+
+
+    async processSync(id) {
     try {
       this.processing = true;
       console.log("Apply " + this.settings)
@@ -559,6 +619,7 @@ export class DialogApply {
     this.processing = false;
     this.complete = true;
   }
+
 
   onApply():void {
     this.process(this.data);

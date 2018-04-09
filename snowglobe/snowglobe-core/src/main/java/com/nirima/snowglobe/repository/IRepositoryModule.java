@@ -4,6 +4,7 @@ import com.nirima.snowglobe.SGExec;
 import com.nirima.snowglobe.SGParameters;
 import com.nirima.snowglobe.web.data.Globe;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -27,4 +28,8 @@ public interface IRepositoryModule {
   void delete() throws IOException;
 
   Globe details();
+
+  SGParameters getVariables() throws IOException;
+
+  void setVariables(SGParameters parameters) throws IOException;
 }

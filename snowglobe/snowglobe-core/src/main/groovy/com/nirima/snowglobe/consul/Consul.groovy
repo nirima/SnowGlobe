@@ -63,13 +63,13 @@ class ConsulKeyPrefix extends Resource<ConsulKeyPrefixState> {
 }
 
 class ConsulKeysStateKey implements Serializable {
-    String path;
-    String value;
+    public String path;
+    public String value;
 }
 
 
 class ConsulKeysState extends ResourceState {
-    List<ConsulKeysStateKey> key = [];
+    public List<ConsulKeysStateKey> key = [];
 
     ConsulKeysState(Resource parent, Closure closure) {
         super(parent, closure);
