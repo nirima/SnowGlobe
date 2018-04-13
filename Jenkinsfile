@@ -90,7 +90,7 @@ def publishDocker() {
 
 def updateDeployedVersion() {
     // Stage 1: Just re-apply a snowglobe
-   snowglobe_apply globeId: 'snowglobe-cd', settings: properties
+   snowglobe_apply globeId: 'snowglobe-cd'
 }
 
 def spinUpTestEnvironment() {
