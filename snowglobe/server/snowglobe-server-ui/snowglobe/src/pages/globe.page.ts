@@ -6,7 +6,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import 'codemirror/mode/groovy/groovy'
 import {AppConfig} from "../services/appConfig";
 import {MAT_DIALOG_DATA, MatChipInputEvent, MatDialog, MatDialogRef} from "@angular/material";
-import {ProgressService} from "../services/progress.service";
+import {ProgressInstance, ProgressService} from "../services/progress.service";
 import { UUID } from 'angular2-uuid';
 import {COMMA, ENTER, SPACE} from "@angular/cdk/keycodes";
 
@@ -222,7 +222,7 @@ export class GlobePage {
 
     };
 
-    console.log(this.config);
+   // console.log(this.config);
 
   }
 
@@ -272,13 +272,13 @@ export class GlobePage {
           dv = dv.concat(thisData);
 
           let dockerInfo = mi[ciName];
-          console.log(dockerInfo);
+          //console.log(dockerInfo);
 
           thisData['containerId'] = dockerInfo['items']['container_id'];
 
           let networkSettings = dockerInfo['items']['info']['NetworkSettings'];
           let thePorts = networkSettings['Ports'];
-          console.log(thePorts);
+         // console.log(thePorts);
           for (const portName in thePorts) {
             let mapping = thePorts[portName][0];
 
@@ -290,7 +290,7 @@ export class GlobePage {
 
             };
 
-            console.log(data);
+          //  console.log(data);
             thisData.net = thisData.net.concat(data);
           }
 
@@ -731,9 +731,11 @@ export class DialogApply {
 
   complete: boolean = false;
 
+  progress:ProgressInstance;
+
   constructor(
     public dialogRef: MatDialogRef<DialogApply>, public globeService: GlobeService,
-    public progress: ProgressService,
+    public progressService: ProgressService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
@@ -742,7 +744,10 @@ export class DialogApply {
     try {
       let topic = UUID.UUID();
 
-      await this.progress.connect(topic);
+      this.progress = this.progressService.progressForTopic(topic);
+
+      await this.progress.connect();
+
       this.progress.onMessage.asObservable().subscribe(x => {
         this.response += x;
 
@@ -978,7 +983,7 @@ export class DialogValidate {
       this.processing = false;
     } catch (e) {
       this.processing = false;
-      this.response = "Error: " + e;
+      this.response = "Error: " + e + "\n" + e._body;
       console.log(e);
     }
 

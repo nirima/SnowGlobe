@@ -182,12 +182,16 @@ public class GlobeResource {
   public String apply(@PathParam("id") String id, @QueryParam("async") String async)
       throws IOException, GlobeException {
 
-    if (async != null) {
-      return applyAsync(id, async);
-    } else {
-      return applySync(id);
+    try {
+      if (async != null) {
+        return applyAsync(id, async);
+      } else {
+        return applySync(id);
+      }
     }
-
+    catch (Exception ex) {
+      throw new GlobeException(ex);
+    }
   }
 
   @Path("/globe/{id}/destroy")
@@ -259,7 +263,7 @@ public class GlobeResource {
     return topic;
   }
 
-  private String applySync(String id) {
+  private String applySync(String id) throws IOException {
     ThreadLog.get().start();
     try {
 
@@ -273,8 +277,6 @@ public class GlobeResource {
         String output = exec.save();
         globeManager.forGlobe(id).setState(output);
       }
-    } catch (Exception ex) {
-      throw new GlobeException(ex);
     } finally {
       ThreadLog.get().stop();
     }
