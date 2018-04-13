@@ -133,9 +133,9 @@ export class HomePage {
   async ngOnInit() {
     this.refresh();
 
-    await this._progressService.connect('home');
+
     console.log(" -- connected -- ");
-    this._progressService.send("FOO BAR");
+
 
   }
   refresh() {
