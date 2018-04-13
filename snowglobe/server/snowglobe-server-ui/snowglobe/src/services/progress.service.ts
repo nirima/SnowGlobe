@@ -24,7 +24,7 @@ export class ProgressService {
     if( this.connected )
       return Promise.resolve(true);
 
-    const wsx = new WebSocket(`ws://localhost:8808/progress?topic=${topic}`);
+    const wsx = new WebSocket(`${this.appConfig.ws}/progress?topic=${topic}`);
 
     this.ws = wsx;
 

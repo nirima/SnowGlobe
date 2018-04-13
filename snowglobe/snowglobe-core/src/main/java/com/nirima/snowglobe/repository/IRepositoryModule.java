@@ -6,6 +6,8 @@ import com.nirima.snowglobe.web.data.Globe;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * API for accessing a repository's module.
@@ -23,13 +25,17 @@ public interface IRepositoryModule {
 
   void setConfig(String name, String data) throws IOException;
 
-  SGExec getSGExec(SGParameters parameters);
+  SGExec getSGExec();
 
   void delete() throws IOException;
 
   Globe details();
 
-  SGParameters getVariables() throws IOException;
+  String getVariables() throws IOException;
 
-  void setVariables(SGParameters parameters) throws IOException;
+  void setVariables(String parameters) throws IOException;
+
+  Set<String> getTags();
+
+  void setTags(Set<String> tags);
 }

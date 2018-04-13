@@ -121,8 +121,13 @@
             <!-- any version of Groovy \>= 1.5.0 should work here -->
             
         </dependency>
-    
 
+        <dependency>
+            <groupId>com.moandjiezana.toml</groupId>
+            <artifactId>toml4j</artifactId>
+            <version>0.7.2</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>

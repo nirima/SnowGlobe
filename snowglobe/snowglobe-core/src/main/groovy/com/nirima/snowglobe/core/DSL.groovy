@@ -132,6 +132,12 @@ public class SnowGlobeSimpleReader {
         modules[id] = newModule;
         return newModule;
     }
+
+    int getResourceCount() {
+        Collection<Integer> cx = modules.values().collect { it.resourceCount };
+        Integer x = cx.sum(0);
+        return x;
+    }
 }
 
 public class SnowGlobeSimpleModule {
@@ -144,6 +150,10 @@ public class SnowGlobeSimpleModule {
         closure.resolveStrategy = Closure.DELEGATE_FIRST
 
         closure();
+    }
+
+    int getResourceCount() {
+        return resources.size();
     }
 
     /*

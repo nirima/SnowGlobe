@@ -1,6 +1,7 @@
 package com.nirima.snowglobe
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.moandjiezana.toml.Toml
 import com.nirima.snowglobe.core.*
 
 import com.nirima.snowglobe.graph.Graph
@@ -20,31 +21,27 @@ import java.security.PrivilegedAction
  */
 public class SGParameters {
 
-    public Map itemMap = [:];
+    Toml data;
+    private Map _itemMap = [:];
 
     SGParameters() {}
 
     SGParameters(Properties properties) {
-        this.itemMap = properties;
+        this._itemMap = properties;
     }
 
     def getProperty(String name) {
-        if( itemMap.containsKey(name))
-            return itemMap.get(name);
+        if( _itemMap.containsKey(name))
+            return _itemMap.get(name);
 
         return System.getProperty(name);
     }
 
-    def save(OutputStream os) {
-        Properties properties1 = new Properties();
-        properties1.putAll(this.itemMap);
-        properties1.store(os, "Saved");
-    }
 
     def load(InputStream inputStream) {
-        Properties properties1 = new Properties();
-        properties1.load(inputStream);
-        this.itemMap = properties1;
+
+        data = new Toml().read(inputStream)
+        this._itemMap = data.toMap();
     }
 }
 

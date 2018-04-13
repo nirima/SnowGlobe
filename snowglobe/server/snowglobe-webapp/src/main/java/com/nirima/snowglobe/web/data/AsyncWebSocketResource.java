@@ -62,7 +62,7 @@ public class AsyncWebSocketResource {
 
     progressManager.register(session);
 
-    session.getRemote().sendString("HOUPLA");
+    session.getRemote().sendString("Connection established\n");
   }
 
 

@@ -3,6 +3,7 @@ package com.nirima.snowglobe.repository;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 import com.nirima.snowglobe.SGExec;
@@ -10,15 +11,22 @@ import com.nirima.snowglobe.SGParameters;
 import com.nirima.snowglobe.web.data.Globe;
 
 import org.apache.commons.io.FileUtils;
+import org.javers.common.collections.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class GlobeProcessor implements IRepositoryModule {
+
+  private static final Logger log = LoggerFactory.getLogger(GlobeProcessor.class);
 
   final String id;
   final FilesystemRepository repo;
@@ -56,18 +64,42 @@ public class GlobeProcessor implements IRepositoryModule {
   }
 
   @Override
-  public SGParameters getVariables() throws IOException {
-    SGParameters parameters = new SGParameters();
+  public String getVariables() throws IOException {
+
     File f = new File(getRepositoryRoot(), id + "/snowglobe.vars");
-    if( f.exists() )
-      parameters.load( new FileInputStream(f));
-    return parameters;
+    if( !f.exists() )
+      return "";
+
+    return Files.toString(f, Charsets.UTF_8);
+
   }
 
   @Override
-  public void setVariables(SGParameters parameters) throws FileNotFoundException {
+  public void setVariables(String data) throws IOException {
     File f = new File(getRepositoryRoot(), id + "/snowglobe.vars");
-    parameters.save( new FileOutputStream(f));
+    Files.write(data.getBytes(), f);
+  }
+
+  @Override
+  public Set<String> getTags() {
+    File f = new File(getRepositoryRoot(), id + "/snowglobe.tags");
+    try {
+      List<String> lines = FileUtils.readLines(f, "UTF-8");
+      return Sets.asSet(lines);
+    } catch (IOException e) {
+      log.error("Error reading tags", e);
+    }
+    return new HashSet<String>();
+  }
+
+  @Override
+  public void setTags(Set<String> tags) {
+    File f = new File(getRepositoryRoot(), id + "/snowglobe.tags");
+    try {
+      FileUtils.writeLines(f, "UTF-8", tags);
+    } catch (IOException e) {
+      log.error("Error writing tags");
+    }
   }
 
   @Override
@@ -112,14 +144,20 @@ public class GlobeProcessor implements IRepositoryModule {
     Files.write(data.getBytes(), f);
   }
 
-  public SGExec getSGExec(SGParameters parameters) {
+  public SGParameters getSGParameters() throws IOException {
+    SGParameters parameters = new SGParameters();
+    parameters.load(new ByteArrayInputStream(getVariables().getBytes()));
+    return parameters;
+  }
+
+  public SGExec getSGExec() {
 
     try {
       SGExec
           sgExec =
           new SGExec(new File(getRepositoryRoot(), id + "/snowglobe.sg"),
                      new File(
-                         getRepositoryRoot(), id + "/snowglobe.sgstate"), parameters);
+                         getRepositoryRoot(), id + "/snowglobe.sgstate"),  getSGParameters());
 
       return sgExec;
     }

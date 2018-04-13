@@ -1,15 +1,25 @@
 package com.nirima.snowglobe.repository;
 
+import com.nirima.snowglobe.core.SnowGlobeSimpleReader;
+import com.nirima.snowglobe.core.SnowGlobeSystem;
 import com.nirima.snowglobe.web.data.Globe;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -56,9 +66,44 @@ public class FilesystemRepository implements IRepository {
           g.name = dir.getName();
           g.description = dir.getName();
 
+
+          try {
+            BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+            g.created = new Date(attr.creationTime().toMillis());
+          } catch (IOException e) {
+            // File system probably doesn't support this attribute.
+          }
+
+
+          File ft = new File(dir,  "/snowglobe.tags");
+          if( ft.exists() ) {
+            try {
+              g.tags = FileUtils.readLines(ft,"UTF-8");
+            } catch(IOException ex) {
+              
+            }
+          }
+
           File f = new File(dir,  "/snowglobe.sgstate");
-          if( f.exists() )
+          if( f.exists() ) {
             g.lastUpdate = new Date(f.lastModified());
+
+            // Determine if we have any state
+            // TODO: we could totally cache this value - if not changed, answer is the same every time.
+            SnowGlobeSystem snowGlobeSystem = new SnowGlobeSystem();
+            try {
+              SnowGlobeSimpleReader sgr = snowGlobeSystem.parseStateOnly(new FileInputStream(f));
+
+              if( sgr == null || sgr.getResourceCount() == 0 ) {
+                g.tags.add("_empty");
+              }
+
+            } catch (FileNotFoundException e) {
+
+            }
+
+          }
+
 
           gg.add(g);
 

@@ -23,11 +23,20 @@ margin: 0;
 .theme-showcase .navbar .container {
   width: auto;
 }
-.CodeMirror {
+.codemirror .CodeMirror {
   border: 1px solid #eee;
   height: auto;
 }
 
+.mat-toolbar {
+  flex: 0 0 auto;
+}
+
+
+.globe-page {
+  height: 100%;
+  display:flex;
+}
 
 .snowglobe-body {
   background: #fafafa;

@@ -17,6 +17,9 @@ public class Globe implements Serializable {
     public String description;
 
     public Date lastUpdate;
+    public Date created;
+
+    public List<String> tags = new ArrayList<>();
 
     public List<String> configFiles = new ArrayList<>();
 

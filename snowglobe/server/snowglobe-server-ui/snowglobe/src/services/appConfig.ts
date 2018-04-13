@@ -8,7 +8,6 @@ export class AppConfig  {
 
   public baseUrl:String;
 
-
   private incomingHost;
   private incomingPort;
 
@@ -17,20 +16,12 @@ export class AppConfig  {
 
     console.debug("Construct AppConfig");
 
-
     let _window = _windowRef.nativeWindow;
 
-    console.debug(".... dun dun dun: " + _window.location.hostname);
-
-    // white label = ampliview, jlr, etc
-    // not white label = audaera
-
-
+    console.debug("connection: " + _window.location.hostname);
 
     this.incomingHost = _window.location.hostname;
     this.incomingPort = _window.location.port;
-
-
 
     if( this.incomingHost == "localhost" ) {
       // Special case for devevlopment
@@ -50,6 +41,10 @@ export class AppConfig  {
     this.baseUrl = _window.location.origin;
 
 
+  }
+
+  public get ws():string {
+    return this.baseUrl.replace("http:","ws:");
   }
 
 

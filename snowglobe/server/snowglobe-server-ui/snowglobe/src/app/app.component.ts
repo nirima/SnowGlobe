@@ -1,6 +1,6 @@
 import {Component, ViewChild, ViewEncapsulation} from '@angular/core';
-import { HTTPTunnel, Client, Mouse, Keyboard } from 'guacamole-js/guacamole'
-import {GlobeService} from "services/globe.service";
+//import { HTTPTunnel, Client, Mouse, Keyboard } from 'guacamole-js/guacamole'
+//import {GlobeService} from "services/globe.service";
 
 
 @Component({

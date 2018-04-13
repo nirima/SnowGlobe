@@ -32,7 +32,7 @@ public class DockerResource {
     globeManager.list().forEach(globe -> {
 
                                   try {
-                                    SGExec sge = globeManager.forGlobe(globe.id).getSGExec(new SGParameters());
+                                    SGExec sge = globeManager.forGlobe(globe.id).getSGExec();
 
                                     sge.sgContext.getModules().forEach(
                                         module -> {

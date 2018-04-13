@@ -2,7 +2,6 @@ package com.nirima.snowglobe.web.data;
 
 
 import com.nirima.snowglobe.SGExec;
-import com.nirima.snowglobe.SGParameters;
 import com.nirima.snowglobe.core.SnowGlobeSimpleReader;
 import com.nirima.snowglobe.core.SnowGlobeSystem;
 import com.nirima.snowglobe.repository.IRepositoryModule;
@@ -22,6 +21,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
@@ -64,6 +65,12 @@ public class GlobeResource {
   @Inject
   GlobeManager globeManager;
 
+  @Path("/version")
+  @GET
+  public String getVersion() {
+    return "0.1";
+  }
+
   @Path("/globes")
   @GET
   @Produces("application/json")
@@ -78,23 +85,54 @@ public class GlobeResource {
     return globeManager.forGlobe(id).details();
   }
 
+  @Path("/globe/{id}/tags")
+  @GET
+  @Produces("application/json")
+  public Set<String> getGlobeTags(@PathParam("id") String id) throws IOException {
+    return globeManager.forGlobe(id).getTags();
+  }
+
+  @Path("/globe/{id}/tags")
+  @PUT
+  @Produces("application/json")
+  public void setGlobeTags(@PathParam("id") String id, Set<String> body) throws IOException {
+    globeManager.forGlobe(id).setTags(body);
+  }
+
+  @Path("/globe/{id}/tag/{tag}")
+  @PUT
+  @Produces("application/json")
+  public void addTag(@PathParam("id") String id, @PathParam("tag")String tag) throws IOException {
+    IRepositoryModule rm = globeManager.forGlobe(id);
+    Set<String> tags = rm.getTags();
+    tags.add(tag);
+    rm.setTags(tags);
+  }
+
+  @Path("/globe/{id}/tag/{tag}")
+  @DELETE
+  @Produces("application/json")
+  public void removeTag(@PathParam("id") String id, @PathParam("tag")String tag) throws IOException {
+    IRepositoryModule rm = globeManager.forGlobe(id);
+    Set<String> tags = rm.getTags();
+    tags.remove(tag);
+    rm.setTags(tags);
+  }
+
 
   @Path("/globe/{id}/vars")
   @GET
   @Produces("text/plain")
   public String getGlobeVars(@PathParam("id") String id) throws IOException {
-    SGParameters parameters = globeManager.forGlobe(id).getVariables();
-    return writeParameters(parameters);
+    return globeManager.forGlobe(id).getVariables();
   }
 
   @Path("/globe/{id}/vars")
   @PUT
   @Produces("text/plain")
   public void setGlobeVars(@PathParam("id") String id, String body) throws IOException {
-    SGParameters parameters = makeParameters(body);
-    globeManager.forGlobe(id).setVariables(parameters);
+    globeManager.forGlobe(id).setVariables(body);
   }
-
 
   /**
    * Read/Write the config
@@ -139,16 +177,15 @@ public class GlobeResource {
   }
 
   @Path("/globe/{id}/apply")
-  @POST
+  @PUT
   @Produces("application/json")
-  public String apply(@PathParam("id") String id, @QueryParam("async") String async, String body)
+  public String apply(@PathParam("id") String id, @QueryParam("async") String async)
       throws IOException, GlobeException {
 
-    SGParameters parameters = makeParameters(body);
     if (async != null) {
-      return applyAsync(id, parameters, async);
+      return applyAsync(id, async);
     } else {
-      return applySync(id, parameters);
+      return applySync(id);
     }
 
   }
@@ -158,8 +195,7 @@ public class GlobeResource {
   @Produces("application/json")
   public String destroy(@PathParam("id") String id) throws IOException, GlobeException {
 
-    SGParameters parameters = new SGParameters();
-    SGExec exec = globeManager.forGlobe(id).getSGExec(parameters);
+    SGExec exec = globeManager.forGlobe(id).getSGExec();
 
     try {
       String txt = "Result:\n" + exec.destroy() + "\n";
@@ -180,32 +216,18 @@ public class GlobeResource {
     globeManager.clone(id);
   }
 
-  private SGParameters makeParameters(String body) throws IOException {
-    SGParameters sgp = new SGParameters();
 
-    sgp.load(new ByteArrayInputStream(body.getBytes()));
-
-    return sgp;
-  }
-
-  private String writeParameters(SGParameters parameters) throws IOException {
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    parameters.save(byteArrayOutputStream);
-    byteArrayOutputStream.close();
-    return byteArrayOutputStream.toString("UTF-8");
-  }
-
-  private String applyAsync(String id, SGParameters parameters, String topic) {
+  private String applyAsync(String id, String topic) {
 
     // ASYNC
-    SGExec exec = globeManager.forGlobe(id).getSGExec(parameters);
+    SGExec exec = globeManager.forGlobe(id).getSGExec();
 
     Runnable r = () -> {
       ProgressManager.Entry entry = progressManager.getEntry(topic);
       try {
 
         try {
-          entry.sendString("[[Starting]]");
+          entry.sendString("[[Starting]]\n");
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -218,12 +240,12 @@ public class GlobeResource {
 
         try {
           globeManager.forGlobe(id).setState(output);
-          entry.sendString("[[Completed OK]]");
+          entry.sendString("[[Completed OK]]\n");
         } catch (IOException e) {
           e.printStackTrace();
 
           try {
-            entry.sendString("[[Completed /Exception/]]");
+            entry.sendString("[[Completed /Exception/]]\n");
           } catch (Exception ex) {
           }
         }
@@ -237,11 +259,11 @@ public class GlobeResource {
     return topic;
   }
 
-  private String applySync(String id, SGParameters parameters) {
+  private String applySync(String id) {
     ThreadLog.get().start();
     try {
 
-      SGExec exec = globeManager.forGlobe(id).getSGExec(parameters);
+      SGExec exec = globeManager.forGlobe(id).getSGExec();
 
       try {
         String txt = "Result:\n" + exec.apply() + "\n";
@@ -293,7 +315,7 @@ public class GlobeResource {
   @Produces("image/png")
   public byte[] getGraph(@PathParam("id") String id) throws Exception {
 
-    SGExec exec = globeManager.forGlobe(id).getSGExec(new SGParameters());
+    SGExec exec = globeManager.forGlobe(id).getSGExec();
 
     ByteArrayOutputStream graphString = new ByteArrayOutputStream();
     exec.graph(graphString);
@@ -311,7 +333,7 @@ public class GlobeResource {
 
     ThreadLog.get().start();
     try {
-      SGExec exec = globeManager.forGlobe(id).getSGExec(new SGParameters());
+      SGExec exec = globeManager.forGlobe(id).getSGExec();
 
     } catch (Exception e) {
       throw new GlobeException(e);

@@ -17,7 +17,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
   MAT_PLACEHOLDER_GLOBAL_OPTIONS, MatButton, MatButtonModule, MatCardModule, MatCheckbox,
-  MatCheckboxModule,
+  MatCheckboxModule, MatChipsModule,
   MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatOptionModule,
   MatProgressBarModule,
   MatProgressSpinner,
@@ -29,12 +29,12 @@ import {WindowRefService} from "../services/windowref.service";
 import {STOMPService} from "../services/stomp/stomp.service";
 import {ProgressService} from "../services/progress.service";
 import {AppNavBarModule} from "../components/app.navbar";
-import {DialogDelete} from "../pages/globe.page";
+import {DialogDelete, DialogTags} from "../pages/globe.page";
 
 @NgModule({
   declarations: [
     AppComponent, HomePage, EnvironmentPage, ConnectionPage, GlobePage,
-    DialogNewSnowglobe, DialogApply,DialogValidate, DialogDestroy, DialogDelete
+    DialogNewSnowglobe, DialogApply,DialogValidate, DialogDestroy, DialogDelete, DialogTags
   ],
   imports: [
     BrowserModule,
@@ -42,6 +42,7 @@ import {DialogDelete} from "../pages/globe.page";
     HttpModule,
     CodemirrorModule,
     BrowserAnimationsModule,
+    MatChipsModule,
     MatTabsModule,
     MatButtonModule,
     MatDialogModule,
@@ -88,6 +89,6 @@ import {DialogDelete} from "../pages/globe.page";
   ],
   providers: [GlobeService, ProgressService, AppConfig, WindowRefService, {provide: MAT_PLACEHOLDER_GLOBAL_OPTIONS, useValue: {float: 'always'}}],
   bootstrap: [AppComponent],
-  entryComponents: [DialogNewSnowglobe, DialogApply, DialogValidate, DialogDestroy, DialogDelete]
+  entryComponents: [DialogNewSnowglobe, DialogApply, DialogTags, DialogValidate, DialogDestroy, DialogDelete]
 })
 export class AppModule { }

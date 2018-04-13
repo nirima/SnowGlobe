@@ -34,6 +34,11 @@ import * as moment from 'moment';
                    background-size: cover;
                  }
                  
+                 .tag-_empty {
+                     background-color: darkgrey;
+                   }
+                
+                 
                  mat-card {
                    margin-bottom: 10px;
                    margin-right: 10px;
@@ -76,7 +81,7 @@ import * as moment from 'moment';
 
   
 <div class="cardbox">
-  <mat-card *ngFor="let globe of globes" class="snowglobe-card" [routerLink]="['/globe', globe.id]">
+  <mat-card *ngFor="let globe of globes" class="snowglobe-card" [routerLink]="['/globe', globe.id]" [ngClass]="tagClasses(globe)">
     <mat-card-header>
       <mat-card-title><b>{{globe.name}}</b></mat-card-title>
     <mat-card-subtitle *ngIf="globe.lastUpdate">Last Update:{{formatDate(globe.lastUpdate)}}</mat-card-subtitle>
@@ -85,6 +90,10 @@ import * as moment from 'moment';
     <mat-card-content>
       <a >{{globe.name}}</a>
     </mat-card-content>
+    <mat-chip-list>
+      <mat-chip *ngFor="let tag of filterTags(globe.tags)" color="primary" selected="true">{{tag}}</mat-chip>
+     
+    </mat-chip-list>
   </mat-card>
   <hr>
        
@@ -131,6 +140,20 @@ export class HomePage {
   }
   refresh() {
     this.globeService.getList().subscribe( it => this.globes = it );
+  }
+
+  tagClasses(g):Array<string> {
+    let t = [];
+    g.tags.forEach(  gt => {t = t.concat(`tag-${gt}`)});
+
+    return t;
+  }
+
+  filterTags(tags):Array<string> {
+    return tags.filter( (t: string) => {
+
+
+      return t.length > 0 && !t.startsWith("_");});
   }
 
   formatDate(dt):string {

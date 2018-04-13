@@ -37,22 +37,22 @@ export class GlobeService {
       }).toPromise();
   }
 
-  async apply(id:string, settings:string):Promise<string> {
+  async apply(id:string):Promise<string> {
     let url = `${this.getBaseURL()}/globe/${id}/apply`;
     console.log("apply " + url);
 
-    return this.http.post(url,settings)
+    return this.http.put(url,"")
       .map( (responseData) => {
         console.log('Incoming' +responseData);
         return responseData.text();
       }).toPromise();
   }
 
-  async applyAsync(id:string, settings:string, topic:string):Promise<string> {
+  async applyAsync(id:string, topic:string):Promise<string> {
     let url = `${this.getBaseURL()}/globe/${id}/apply?async=${topic}`;
     console.log("apply " + url);
 
-    return this.http.post(url,settings)
+    return this.http.put(url,"")
       .map( (responseData) => {
         console.log('Incoming' +responseData);
         return responseData.text();
@@ -166,6 +166,29 @@ export class GlobeService {
     return this.http.put(url, state).toPromise();
   }
 
+  async getTags(id: string):Promise<Array<string>> {
+    let url = `${this.getBaseURL()}/globe/${id}/tags`;
+    console.log("fetch " + url);
+
+
+
+    return this.http.get(url)
+      .map( (responseData) => {
+        console.log('Incoming' +responseData);
+        return responseData.json();
+      }).toPromise();
+  }
+
+  async addTag(id:string, tag:string) {
+    let url = `${this.getBaseURL()}/globe/${id}/tag/${tag}`;
+    return this.http.put(url, "").toPromise();
+  }
+
+  async deleteTag(id:string, tag:string) {
+    let url = `${this.getBaseURL()}/globe/${id}/tag/${tag}`;
+    return this.http.delete(url).toPromise();
+  }
+
 
 
   async getJSONState(id: string):Promise<any> {
@@ -181,7 +204,11 @@ export class GlobeService {
     return this.http.get(url, opts)
       .map( (responseData) => {
         console.log('Incoming' +responseData);
-        return JSON.parse(responseData.text());
+        try {
+          return JSON.parse(responseData.text());
+        } catch(e) {
+          return null;
+        }
       }).toPromise();
   }
 

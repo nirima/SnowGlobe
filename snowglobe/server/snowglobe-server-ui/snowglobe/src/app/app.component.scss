@@ -34,7 +34,9 @@ app-root > .main-content {
 }
 
 .main-content {
-
+    display:flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 
