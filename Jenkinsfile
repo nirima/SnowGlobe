@@ -18,14 +18,11 @@ def buildEnv;
 
 
 node {
-   stage(name: "Initialize") {
-     buildEnv = load 'jenkins/buildEnv.groovy';
-     buildEnv(currentBuild);
-   }
-
-
+   
   stage(name:"Checkout") {
     checkout scm;
+     buildEnv = load 'jenkins/buildEnv.groovy';
+     buildEnv(currentBuild);
   }
 
   stage(name:"Build") {
