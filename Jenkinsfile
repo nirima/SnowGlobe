@@ -72,14 +72,16 @@ def publishDocker() {
 
           withDockerRegistry([ credentialsId: "registry_nirima", url: "" ]) {
             image.push();
+            image.push('latest');
           }
         }
         else {
-            String tags = "nirima/snowglobe:latest\nnirima/snowglobe:${env.BUILD_NUMBER}";
+            String tags = "nirima/snowglobe:${env.BUILD_NUMBER}";
              def image = docker.build(tags, "-f prod/Dockerfile prod");
 
               withDockerRegistry([ credentialsId: "docker_hub", url: "" ]) {
                 image.push();
+                image.push('latest');
               }
         }
       

@@ -71,14 +71,12 @@ String tagBase(String prefix) {
     return tagBase;
 }
 
+
 // Return the build tags for this project
 String buildTags(String repository, String prefix) {
 
     def tagBase = tagBase(prefix);
-    def thisTag       = "${repository}/${tagBase}:${env.BUILD_NUMBER}";
-    def thisLatestTag = "${repository}/${tagBase}:latest";
-    String tags       = "${thisLatestTag}\n${thisTag}";
-    return tags;
+    return "${repository}/${tagBase}:${env.BUILD_NUMBER}";
 }
 
 
