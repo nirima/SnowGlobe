@@ -37,6 +37,10 @@ import * as moment from 'moment';
                  .tag-_empty {
                      background-color: darkgrey;
                    }
+                 
+                 .tag-_state_error {
+                   background-color: red;
+                 }
                 
                  
                  mat-card {

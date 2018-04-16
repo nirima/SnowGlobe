@@ -98,10 +98,13 @@ public class FilesystemRepository implements IRepository {
                 g.tags.add("_empty");
               }
 
-            } catch (FileNotFoundException e) {
-
+            } catch (Exception e) {
+              if(e instanceof FileNotFoundException) {
+                // this one is OK
+              } else {
+                g.tags.add("_state_error");
+              }
             }
-
           }
 
 

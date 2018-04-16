@@ -38,12 +38,16 @@ public class ProgressManager {
   public static class Entry {
     Session session;
 
-    public void sendString(String s) throws IOException {
+    public void sendString(String s) {
       if( session == null ) {
         log.debug("Not sending to empty session");
         return;
       }
-      session.getRemote().sendString(s);
+      try {
+        session.getRemote().sendString(s);
+      } catch (IOException e) {
+        // Likely the remote was just closed
+      }
     }
   }
 

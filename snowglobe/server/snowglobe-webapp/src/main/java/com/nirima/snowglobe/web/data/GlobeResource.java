@@ -230,31 +230,37 @@ public class GlobeResource {
       ProgressManager.Entry entry = progressManager.getEntry(topic);
       try {
 
-        try {
-          entry.sendString("[[Starting]]\n");
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+
+        entry.sendString("[[Starting]]\n");
+
 
         ThreadLog.set(new TopicLogger(entry)).start();
 
         exec.apply();
-      } finally {
+        entry.sendString("[[Completed OK]]\n");
+      }
+      catch(Exception ex) {
+          entry.sendString("[[Completed FAIL]]\n");
+          entry.sendString(ex.getMessage());
+      }
+      finally {
+        // Always Save the state.
         String output = exec.save();
 
         try {
           globeManager.forGlobe(id).setState(output);
-          entry.sendString("[[Completed OK]]\n");
-        } catch (IOException e) {
-          e.printStackTrace();
 
-          try {
+        } catch (IOException e) {
+            e.printStackTrace();
+
+
             entry.sendString("[[Completed /Exception/]]\n");
-          } catch (Exception ex) {
-          }
+            entry.sendString(e.getMessage());
+
         }
 
         progressManager.closeEntry(topic);
+        ThreadLog.get().stop();
       }
     };
 
@@ -262,6 +268,8 @@ public class GlobeResource {
 
     return topic;
   }
+
+
 
   private String applySync(String id) throws IOException {
     ThreadLog.get().start();

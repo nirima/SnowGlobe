@@ -10,7 +10,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "release": "ng build --base-href /secure/",
-    "release-two": "ng build --prod --aot false --base-href /secure/"
+    "release-two": "ng build --prod --base-href /secure/"
   },
   "private": true,
   "dependencies": {

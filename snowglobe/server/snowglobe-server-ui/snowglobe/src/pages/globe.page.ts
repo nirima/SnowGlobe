@@ -795,65 +795,6 @@ export class DialogApply {
 
 
 @Component({
-             selector: 'dialog-clone',
-             template: `<h1 mat-dialog-title>Clone Snowglobe</h1>
-             <mat-progress-bar *ngIf="processing" mode="indeterminate"></mat-progress-bar>
-
-             <div mat-dialog-content>
-
-               <h2>Settings:</h2>
-               <mat-form-field class="example-full-width">
-                 <input matInput placeholder="Name">
-               </mat-form-field>
-
-               <h2>Response:</h2>
-               <mat-progress-spinner *ngIf="response == null"
-                                     mode="indeterminate"></mat-progress-spinner>
-               <codemirror *ngIf="response != null" [ngModel]="response" [config]="config">
-
-               </codemirror>
-
-             </div>
-             <div mat-dialog-actions>
-               <button mat-button (click)="onClone()" tabindex="-1">Clone</button>
-               <button mat-button (click)="onNoClick()" tabindex="-1">Cancel</button>
-             </div>
-             `,
-           })
-export class DialogClone {
-
-  processing: boolean = false;
-
-  response: string;
-  newId: string;
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogClone>, public globeService: GlobeService,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
-
-  }
-
-  async process(id) {
-    try {
-      this.response = await this.globeService.clone(id, this.newId);
-    } catch (e) {
-      this.response = "Error: " + e._body;
-      console.log(e);
-    }
-
-  }
-
-  onClone(): void {
-    this.process(this.data);
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-}
-
-@Component({
              selector: 'dialog-destroy',
              template: `<h1 mat-dialog-title>Destroy Snowglobe</h1>
              <mat-progress-bar *ngIf="processing" mode="indeterminate"></mat-progress-bar>
