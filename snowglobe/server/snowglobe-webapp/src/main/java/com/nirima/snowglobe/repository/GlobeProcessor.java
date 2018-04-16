@@ -86,7 +86,7 @@ public class GlobeProcessor implements IRepositoryModule {
     try {
       List<String> lines = FileUtils.readLines(f, "UTF-8");
       return Sets.asSet(lines);
-    } catch (IOException e) {
+    } catch (Exception e) {
       log.error("Error reading tags", e);
     }
     return new HashSet<String>();
