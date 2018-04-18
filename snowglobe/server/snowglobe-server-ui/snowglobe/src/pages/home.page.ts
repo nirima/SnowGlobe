@@ -29,10 +29,7 @@ import * as moment from 'moment';
                    flex-wrap: wrap;
                  }
                  
-                 .snowglobe-header-image {
-                   background-image: url('../assets/images/snowglobe.png');
-                   background-size: cover;
-                 }
+                
                  
                  .tag-_empty {
                      background-color: darkgrey;
