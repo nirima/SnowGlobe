@@ -18,7 +18,9 @@ def buildEnv;
 
 
 node {
-   
+
+  slackSend channel: "#snowglobe", message: "Build commenced - ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+
   stage(name:"Checkout") {
     checkout scm;
      buildEnv = load 'jenkins/buildEnv.groovy';
@@ -44,9 +46,12 @@ node {
       } else {
           // Master builds : Continuously Deploy
           updateDeployedVersion();
-          slackSend channel: "#snowglobe", message: "Docker :whale: LIVE ENV UPDATED - ${env.JOB_NAME} ${env.BUILD_NUMBER} - ${testurl}"
+          slackSend channel: "#snowglobe", message: "Docker :whale: LIVE ENV UPDATED - ${env.JOB_NAME} ${env.BUILD_NUMBER}"
       }
   }
+
+  slackSend channel: "#snowglobe", message: "Build complete OK - ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+
 }
 
 
