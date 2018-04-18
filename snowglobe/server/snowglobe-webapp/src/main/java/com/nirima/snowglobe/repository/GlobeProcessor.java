@@ -8,6 +8,7 @@ import com.google.common.io.Files;
 
 import com.nirima.snowglobe.SGExec;
 import com.nirima.snowglobe.SGParameters;
+import com.nirima.snowglobe.SGTags;
 import com.nirima.snowglobe.web.data.Globe;
 
 import org.apache.commons.io.FileUtils;
@@ -147,6 +148,7 @@ public class GlobeProcessor implements IRepositoryModule {
   public SGParameters getSGParameters() throws IOException {
     SGParameters parameters = new SGParameters();
     parameters.load(new ByteArrayInputStream(getVariables().getBytes()));
+    parameters.tags = new SGTags(this);
     return parameters;
   }
 

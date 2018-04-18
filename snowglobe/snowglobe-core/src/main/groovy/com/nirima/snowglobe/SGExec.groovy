@@ -9,6 +9,7 @@ import com.nirima.snowglobe.graph.GraphBuilder
 import com.nirima.snowglobe.plan.Plan
 import com.nirima.snowglobe.plan.PlanBuilder
 import com.nirima.snowglobe.plan.PlanType
+import com.nirima.snowglobe.repository.IRepositoryModule
 import org.codehaus.groovy.runtime.InvokerHelper
 
 import java.lang.reflect.Field
@@ -24,13 +25,15 @@ public class SGParameters {
     Toml data;
     private Map _itemMap = [:];
 
+    public SGTags tags;
+
     SGParameters() {}
 
     SGParameters(Properties properties) {
         this._itemMap = properties;
     }
 
-    def getProperty(String name) {
+    def propertyMissing(String name) {
         if( _itemMap.containsKey(name))
             return _itemMap.get(name);
 
@@ -42,6 +45,36 @@ public class SGParameters {
 
         data = new Toml().read(inputStream)
         this._itemMap = data.toMap();
+    }
+}
+
+/**
+ * Access to the tags
+ */
+public class SGTags {
+    private final IRepositoryModule globeProcessor;
+    Set<String> tags;
+
+    SGTags(IRepositoryModule globeProcessor) {
+        this.globeProcessor = globeProcessor;
+        this.tags = globeProcessor.getTags();
+    }
+
+    public boolean contains(String name) {
+        if( tags == null )
+            return false;
+
+        return tags.contains(name);
+    }
+
+    public void add(String tag) {
+        this.tags.add(tag);
+        globeProcessor.setTags(tags);
+    }
+
+    public void remove(String tag) {
+        this.tags.remove(tag);
+        globeProcessor.setTags(tags);
     }
 }
 
