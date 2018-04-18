@@ -123,12 +123,16 @@ Either by talking REST to the SnowGlobe server, or using the Jenkins snowglobe-p
      
        String name1 = "${buildEnv.branch}".replace("/","-").toLowerCase();
  
-       String properties = "name=${name1}\nbuild=${env.BUILD_NUMBER}\n";
+       String properties = """name="${name1}" 
+                              build=${env.BUILD_NUMBER} """;
  
         String name = "${name1}-${env.BUILD_NUMBER}";
  
         // Clone
         snowglobe_clone createAction: true, sourceId: 'ci-template', targetId: name
+        
+        // Set properties
+        snowglobe_set_variables globeId: name, variables: properties
         
         // Apply     
         snowglobe_apply globeId: name, settings: properties
