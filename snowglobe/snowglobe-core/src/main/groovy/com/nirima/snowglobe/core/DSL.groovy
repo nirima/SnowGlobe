@@ -604,6 +604,12 @@ abstract public class Resource<T extends ResourceState> {
     }
 }
 
+/**
+ * A Provider represents an item that can provide things - for example, interfacing to an
+ * API or system.
+ *
+ * Providers are considered stateless.
+ */
 @Slf4j
 public class Provider {
 

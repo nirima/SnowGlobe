@@ -133,3 +133,21 @@ void withJavaEnv(List envVars = [], def body) {
         body.call()
     }
 }
+
+def commentOnPR(String pullRequestNumber, String comment) {
+  def yourCredential = 'github'
+     def yourOrga = "nirima"
+     def yourRepo = "SnowGlobe"
+
+     def body="""{
+                  "body": "${comment}",
+                  "path": "/",
+                  "position": 0
+            }"""
+
+
+     httpRequest authentication: "${yourCredential}", httpMode: 'POST',
+         requestBody: body,
+         url: "https://api.github.com/repos/${yourOrga}/${yourRepo}/issues/${pullRequestNumber}/comments"
+
+}
