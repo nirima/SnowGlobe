@@ -1,0 +1,60 @@
+FROM java:8
+
+# dot for images
+RUN apt-get update && apt-get install -y graphviz curl && rm -rf /var/lib/apt/lists/*
+
+
+# get ContainerPilot release
+ENV CONTAINERPILOT_VERSION 3.7.0
+RUN export CP_SHA1=b10b30851de1ae1c095d5f253d12ce8fe8e7be17 \
+    && curl -Lso /tmp/containerpilot.tar.gz \
+         "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
+    && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \
+    && tar zxf /tmp/containerpilot.tar.gz -C /bin \
+    && rm /tmp/containerpilot.tar.gz
+
+# Install Consul
+# Releases at https://releases.hashicorp.com/consul
+RUN export CONSUL_VERSION=1.0.7 \
+    && export CONSUL_CHECKSUM=6c2c8f6f5f91dcff845f1b2ce8a29bd230c11397c448ce85aae6dacd68aa4c14 \
+    && curl --retry 7 --fail -vo /tmp/consul.zip "https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip" \
+    && echo "${CONSUL_CHECKSUM}  /tmp/consul.zip" | sha256sum -c \
+    && unzip /tmp/consul -d /usr/local/bin \
+    && rm /tmp/consul.zip \
+    && mkdir /config \
+    && mkdir /etc/consul
+
+# Install Consul template
+# Releases at https://releases.hashicorp.com/consul-template/
+RUN export CONSUL_TEMPLATE_VERSION=0.19.4 \
+    && export CONSUL_TEMPLATE_CHECKSUM=5f70a7fb626ea8c332487c491924e0a2d594637de709e5b430ecffc83088abc0 \
+    && curl --retry 7 --fail -Lso /tmp/consul-template.zip "https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip" \
+    && echo "${CONSUL_TEMPLATE_CHECKSUM}  /tmp/consul-template.zip" | sha256sum -c \
+    && unzip /tmp/consul-template.zip -d /usr/local/bin \
+    && rm /tmp/consul-template.zip
+
+
+# Add our configuration files and scripts
+ADD containerpilot.json5 /etc/containerpilot.json5
+
+
+RUN mkdir -p /usr/local/snowglobe/
+RUN mkdir -p /var/snowglobe/
+
+
+ADD snowglobe.jar /usr/local/snowglobe/
+ADD run.sh /usr/local/snowglobe/
+
+RUN chmod -R a+rw /usr/local/snowglobe
+
+RUN ls -l /usr/local/snowglobe
+
+ENV repositoryRoot /var/snowglobe
+
+#expose so it can survive restarts
+VOLUME /var/snowglobe
+VOLUME /var/run/docker.sock
+
+EXPOSE 8808
+
+CMD [ "/bin/containerpilot", "-config", "/etc/containerpilot.json5"]

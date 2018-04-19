@@ -1,0 +1,94 @@
+{
+    consul: "localhost:8500",
+  logging: {
+    level: "{{ if .LOG_LEVEL }}{{ .LOG_LEVEL }}{{ else }}INFO{{ end }}",
+    format: "text"
+  },
+  jobs: [
+    {
+      name: "preStart",
+      exec: "generate-config"
+    },
+    {
+      name: "nginx",
+      port: 80,
+      interfaces: ["eth0"],
+      exec: "nginx",
+      when: {
+        source: "preStart",
+        once: "exitSuccess"
+      },
+      health: {
+        exec: "health-check http",
+        interval: 10,
+        ttl: 25
+      }
+    },
+    {
+      name: "nginx-public",
+      port: 80,
+      interfaces: ["eth1", "eth0"],
+      health: {
+        exec: "health-check http",
+        interval: 10,
+        ttl: 25,
+      }
+    },
+     {
+    name: 'consul-agent',
+     exec: ['/usr/local/bin/consul', 'agent',
+                  '-data-dir=/var/lib/consul',
+                  '-config-dir=/etc/consul',
+                  '-log-level=err',
+                  '-rejoin',
+                  '-retry-join', '{{ .CONSUL | default "consul" }}',
+                  '-retry-max', '10',
+                  '-retry-interval', '10s'
+                  ],
+      restarts: 'unlimited'
+      },
+    {
+      name: "onChange",
+      exec: "reload",
+      when: {
+        source: "watch.snowglobe",
+        each: "changed"
+      }
+    },
+    {
+      name: "sensor-unhandled",
+      exec: "/usr/local/bin/sensor unhandled",
+      when: {
+        interval: "5s"
+      }
+    },
+    {
+      name: "sensor-connections-load",
+      exec: "/usr/local/bin/sensor connections_load",
+      when: {
+        interval: "5s"
+      }
+    }
+  ],
+  watches: [
+    {
+      name: "snowglobe",
+      interval: 7
+    }
+  ],
+  telemetry: {
+    port: 9090,
+    metrics: [
+      {
+        name: "nginx_connections_unhandled_total",
+        help: "Number of accepted connnections that were not handled",
+        type: "gauge"
+      },
+      {
+        name: "nginx_connections_load",
+        help: "Ratio of active connections (less waiting) to the maximum worker connections",
+        type: "gauge"
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  consul: "localhost:8500",
+  logging: {
+    level: "{{ if .LOG_LEVEL }}{{ .LOG_LEVEL }}{{ else }}INFO{{ end }}",
+    format: "text"
+  },
+  "jobs": [
+    {
+      "name": "snowglobe",
+      exec: "/usr/local/snowglobe/run.sh",
+      "port": 8808,    
+      "health": {
+         exec: "/usr/bin/curl -o /dev/null --fail -s http://localhost:8808",
+         interval: 10,
+         ttl: 25
+         }      
+    {{ if .CONSUL_TAGS }}
+  ,"tags": [
+    {{range $i, $arr := .CONSUL_TAGS | split ","}}
+    {{if $i}}, {{end}}"{{.}}"{{end}}
+    ]
+    {{ end }}
+  },
+  {
+    name: 'consul-agent',
+     exec: ['/usr/local/bin/consul', 'agent',
+                  '-data-dir=/var/lib/consul',
+                  '-config-dir=/etc/consul',
+                  '-log-level=err',
+                  '-rejoin',
+                  '-retry-join', '{{ .CONSUL | default "consul" }}',
+                  '-retry-max', '10',
+                  '-retry-interval', '10s'],
+      restarts: 'unlimited'
+      }
+
+  ]
+}
