@@ -69,8 +69,6 @@ def publishDocker() {
       // Prepare
       sh './prod/build.sh';
 
-
-
         if( buildEnv.isPR() ) {
             String tags = buildEnv.buildTags("dev.nirima.com", "snowglobe");
             def image = docker.build(tags, "-f prod/Dockerfile prod");
@@ -81,13 +79,32 @@ def publishDocker() {
           }
         }
         else {
-            String tags = "nirima/snowglobe:${env.BUILD_NUMBER}";
+             String tags = "nirima/snowglobe:${env.BUILD_NUMBER}";
              def image = docker.build(tags, "-f prod/Dockerfile prod");
 
               withDockerRegistry([ credentialsId: "docker_hub", url: "" ]) {
                 image.push();
                 image.push('latest');
               }
+
+              // Also in release push docker images for snowglobe-autopilot
+              tags = "nirima/snowglobe-autopilot:${env.BUILD_NUMBER}";
+              image = docker.build(tags, "-f prod/Dockerfile.autopilot prod");
+
+              withDockerRegistry([ credentialsId: "docker_hub", url: "" ]) {
+                image.push();
+                image.push('latest');
+              }
+
+              // Also in release push nginx images
+              tags = "nirima/nginx-snowglobe-autopilot:${env.BUILD_NUMBER}";
+              image = docker.build(tags, "-f prod/nginx/Dockerfile prod/nginx");
+
+              withDockerRegistry([ credentialsId: "docker_hub", url: "" ]) {
+                image.push();
+                image.push('latest');
+              }
+
         }
       
 
