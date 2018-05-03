@@ -134,7 +134,7 @@ public class FilesystemRepository implements IRepository {
 
     File location = getPathForUri(uri);
 
-    CredentialsProvider cp = new UsernamePasswordCredentialsProvider("magnayn", "mbax3nrm");
+    CredentialsProvider cp = new UsernamePasswordCredentialsProvider("magnayn", "");
 
     Git git = Git.cloneRepository()
         .setCredentialsProvider(cp)
