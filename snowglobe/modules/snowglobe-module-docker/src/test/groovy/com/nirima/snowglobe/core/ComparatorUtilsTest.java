@@ -3,6 +3,7 @@ package com.nirima.snowglobe.core;
 import com.nirima.snowglobe.docker.DockerContainerPort;
 import com.nirima.snowglobe.docker.DockerContainerState;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -14,11 +15,11 @@ public class ComparatorUtilsTest {
     DockerContainerState one = new DockerContainerState(null,null);
     DockerContainerState two = new DockerContainerState(null,null);
 
-    assertEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    Assert.assertEquals(ComparatorUtils.fieldwiseCompare(one, two), 0) ;
     assertEquals( one.compareTo(two), 0);
 
     one.name = "foo bar";
-    assertNotEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    Assert.assertNotEquals(ComparatorUtils.fieldwiseCompare(one, two), 0) ;
     assertNotEquals( one.compareTo(two), 0);
   }
 
@@ -32,7 +33,7 @@ public class ComparatorUtilsTest {
     two.setInternal(1234);
     two.setExternal(5678);
     
-    assertEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    Assert.assertEquals(ComparatorUtils.fieldwiseCompare(one, two), 0) ;
     assertEquals( one.compareTo(two), 0);
 
 
@@ -43,7 +44,7 @@ public class ComparatorUtilsTest {
     DockerContainerState one = new DockerContainerState(null,null);
     DockerContainerState two = new DockerContainerState(null,null);
 
-    assertEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    Assert.assertEquals(ComparatorUtils.fieldwiseCompare(one, two), 0) ;
     assertEquals( one.compareTo(two), 0);
 
 
@@ -53,7 +54,7 @@ public class ComparatorUtilsTest {
 
 
     one.ports.add(p);
-    assertNotEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    Assert.assertNotEquals(ComparatorUtils.fieldwiseCompare(one, two), 0) ;
     assertNotEquals( one.compareTo(two), 0);
 
 
@@ -63,7 +64,7 @@ public class ComparatorUtilsTest {
 
     two.ports.add(p2);
 
-    assertEquals( ComparatorUtils.fieldwiseCompare(one,two), 0) ;
+    Assert.assertEquals(ComparatorUtils.fieldwiseCompare(one, two), 0) ;
     assertEquals( one.compareTo(two), 0);
 
 

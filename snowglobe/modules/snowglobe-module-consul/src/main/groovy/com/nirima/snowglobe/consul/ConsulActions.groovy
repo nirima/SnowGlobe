@@ -78,8 +78,10 @@ class ConsulKeysAction extends PlanActionBase<ConsulKeys, ConsulKeysState> {
         return desiredState
     }
 
+    @Override
+    ConsulKeysState update(ConsulKeysState old, ConsulKeysState newState) {
+        // Just force into
+        create(newState);
 
-
-
-
+    }
 }

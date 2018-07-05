@@ -19,6 +19,7 @@
         <module>snowglobe-core</module>
         <module>snowglobe-sinatra</module>
         <module>snowglobe-exe</module>
+        <module>modules</module>
     </modules>
     
 

@@ -4,8 +4,11 @@ package com.nirima.snowglobe.web.data;
 import com.nirima.snowglobe.SGExec;
 import com.nirima.snowglobe.core.SnowGlobeSimpleReader;
 import com.nirima.snowglobe.core.SnowGlobeSystem;
-import com.nirima.snowglobe.repository.IRepositoryModule;
+import com.nirima.snowglobe.repository.Credentials;
+import com.nirima.snowglobe.repository.IRepositoryItem;
+import com.nirima.snowglobe.repository.ITransactionalRepositoryItem;
 import com.nirima.snowglobe.utils.ThreadLog;
+import com.nirima.snowglobe.web.data.services.CredentialsManager;
 import com.nirima.snowglobe.web.data.services.GlobeManager;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -20,10 +23,12 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -61,9 +66,11 @@ public class GlobeResource {
   @Inject
   ProgressManager progressManager;
 
-
   @Inject
   GlobeManager globeManager;
+
+  @Inject
+  CredentialsManager credentialsManager;
 
   @Path("/version")
   @GET
@@ -96,27 +103,36 @@ public class GlobeResource {
   @PUT
   @Produces("application/json")
   public void setGlobeTags(@PathParam("id") String id, Set<String> body) throws IOException {
-    globeManager.forGlobe(id).setTags(body);
+    doGlobeAction(id, "Set Tags", globe -> globe.setTags(body));
   }
+
 
   @Path("/globe/{id}/tag/{tag}")
   @PUT
   @Produces("application/json")
-  public void addTag(@PathParam("id") String id, @PathParam("tag")String tag) throws IOException {
-    IRepositoryModule rm = globeManager.forGlobe(id);
-    Set<String> tags = rm.getTags();
-    tags.add(tag);
-    rm.setTags(tags);
+  public void addTag(@PathParam("id") String id, @PathParam("tag") String tag) throws IOException {
+
+    doGlobeAction(id, "Added Tag " + tag, rm ->
+                  {
+                    Set<String> tags = rm.getTags();
+                    tags.add(tag);
+                    rm.setTags(tags);
+                  }
+    );
   }
 
   @Path("/globe/{id}/tag/{tag}")
   @DELETE
   @Produces("application/json")
-  public void removeTag(@PathParam("id") String id, @PathParam("tag")String tag) throws IOException {
-    IRepositoryModule rm = globeManager.forGlobe(id);
-    Set<String> tags = rm.getTags();
-    tags.remove(tag);
-    rm.setTags(tags);
+  public void removeTag(@PathParam("id") String id, @PathParam("tag") String tag)
+      throws IOException {
+
+    doGlobeAction(id, "Removed Tag " + tag, rm ->
+    {
+      Set<String> tags = rm.getTags();
+      tags.remove(tag);
+      rm.setTags(tags);
+    });
   }
 
 
@@ -188,8 +204,7 @@ public class GlobeResource {
       } else {
         return applySync(id);
       }
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
       throw new GlobeException(ex);
     }
   }
@@ -199,69 +214,85 @@ public class GlobeResource {
   @Produces("application/json")
   public String destroy(@PathParam("id") String id) throws IOException, GlobeException {
 
-    SGExec exec = globeManager.forGlobe(id).getSGExec();
+    return doGlobeFunction(id, "Destroy " + id, globe ->
+                           {
+                             SGExec exec = globe.getSGExec();
 
-    try {
-      String txt = "Result:\n" + exec.destroy() + "\n";
+                             try {
+                               String txt = "Result:\n" + exec.destroy() + "\n";
 
-      txt = txt + "Messages:\n" + ((ThreadLog) ThreadLog.get()).getMessages();
-      return txt;
-    } finally {
-      String output = exec.save();
-      globeManager.forGlobe(id).setState(output);
-    }
+                               txt =
+                                   txt + "Messages:\n" + ((ThreadLog) ThreadLog.get())
+                                       .getMessages();
+                               return txt;
+                             } finally {
+                               String output = exec.save();
+                               try {
+                                 globe.setState(output);
+                               } catch (IOException e) {
+                                 e.printStackTrace();
+                               }
+                             }
+                           }
+    );
+
   }
 
-  @Path("/globes/clone/{id}")
+  @Path("/globes/clone")
   @POST
   @Produces("application/json")
-  public void clone(@PathParam("id") String id)
+  public void clone(CloneData data)
       throws IOException, GlobeException, GitAPIException, URISyntaxException {
-    globeManager.clone(id);
+
+    Credentials creds;
+    if (data.credentials != null) {
+      creds = new Credentials(data.credentials.username, data.credentials.password);
+    } else {
+      creds = credentialsManager.getCredentialsForLocation(new URL(data.url));
+    }
+    globeManager.clone(data.name, data.url, creds);
   }
 
 
-  private String applyAsync(String id, String topic) {
+  private String applyAsync(final String id, final String topic) {
 
-    // ASYNC
-    SGExec exec = globeManager.forGlobe(id).getSGExec();
 
     Runnable r = () -> {
       ProgressManager.Entry entry = progressManager.getEntry(topic);
-      try {
 
+      doGlobeAction(id, "Apply " + id, globe ->
+      {
+        SGExec exec = globe.getSGExec();
+        try {
 
-        entry.sendString("[[Starting]]\n");
+          entry.sendString("[[Starting]]\n");
 
+          ThreadLog.set(new TopicLogger(entry)).start();
 
-        ThreadLog.set(new TopicLogger(entry)).start();
-
-        exec.apply();
-        entry.sendString("[[Completed OK]]\n");
-      }
-      catch(Exception ex) {
+          exec.apply();
+          entry.sendString("[[Completed OK]]\n");
+        } catch (Exception ex) {
           entry.sendString("[[Completed FAIL]]\n");
           entry.sendString(ex.getMessage());
-      }
-      finally {
-        // Always Save the state.
-        String output = exec.save();
+        } finally {
+          // Always Save the state.
+          String output = exec.save();
 
-        try {
-          globeManager.forGlobe(id).setState(output);
+          try {
+           globe.setState(output);
 
-        } catch (IOException e) {
+          } catch (IOException e) {
             e.printStackTrace();
-
 
             entry.sendString("[[Completed /Exception/]]\n");
             entry.sendString(e.getMessage());
 
-        }
+          }
 
-        progressManager.closeEntry(topic);
-        ThreadLog.get().stop();
-      }
+          progressManager.closeEntry(topic);
+          ThreadLog.get().stop();
+        }
+      });
     };
 
     new Thread(r).start();
@@ -270,21 +301,27 @@ public class GlobeResource {
   }
 
 
-
   private String applySync(String id) throws IOException {
     ThreadLog.get().start();
     try {
 
-      SGExec exec = globeManager.forGlobe(id).getSGExec();
+      return doGlobeFunction(id, "Destroy " + id, globe ->
+      {
+        SGExec exec = globe.getSGExec();
 
-      try {
-        String txt = "Result:\n" + exec.apply() + "\n";
-        txt = txt + "Messages:\n" + ((ThreadLog) ThreadLog.get()).getMessages();
-        return txt;
-      } finally {
-        String output = exec.save();
-        globeManager.forGlobe(id).setState(output);
-      }
+        try {
+          String txt = "Result:\n" + exec.apply() + "\n";
+          txt = txt + "Messages:\n" + ((ThreadLog) ThreadLog.get()).getMessages();
+          return txt;
+        } finally {
+          String output = exec.save();
+          try {
+            globe.setState(output);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      });
     } finally {
       ThreadLog.get().stop();
     }
@@ -304,13 +341,13 @@ public class GlobeResource {
     globeManager.forGlobe(id).delete();
   }
 
-  @Path("/globe/{id}/clone/{newId}")
+  @Path("/globe/{id}/duplicate/{newId}")
   @POST
   @Produces("application/json")
-  public void clone(@PathParam("id") String id, @PathParam("newId") String newId,
-                    @QueryParam("includeState") boolean includeState) throws IOException {
-    IRepositoryModule newItem = globeManager.forGlobe(newId);
-    IRepositoryModule oldItem = globeManager.forGlobe(id);
+  public void duplicate(@PathParam("id") String id, @PathParam("newId") String newId,
+                        @QueryParam("includeState") boolean includeState) throws IOException {
+    IRepositoryItem newItem = globeManager.forGlobe(newId);
+    IRepositoryItem oldItem = globeManager.forGlobe(id);
 
     newItem.create();
     newItem.setConfig(null, oldItem.getConfig(null));
@@ -395,5 +432,31 @@ public class GlobeResource {
 
   }
 
+  private void doGlobeAction(String id, String message, Consumer<IRepositoryItem> fn) {
+    IRepositoryItem item = globeManager.forGlobe(id);
+    if (item instanceof ITransactionalRepositoryItem) {
+      ((ITransactionalRepositoryItem) item).begin();
+    }
+    try {
+      fn.accept(item);
+    } finally {
+      if (item instanceof ITransactionalRepositoryItem) {
+        ((ITransactionalRepositoryItem) item).commit(message);
+      }
+    }
+  }
 
+  private <T> T doGlobeFunction(String id, String message, Function<IRepositoryItem, T> fn) {
+    IRepositoryItem item = globeManager.forGlobe(id);
+    if (item instanceof ITransactionalRepositoryItem) {
+      ((ITransactionalRepositoryItem) item).begin();
+    }
+    try {
+      return fn.apply(item);
+    } finally {
+      if (item instanceof ITransactionalRepositoryItem) {
+        ((ITransactionalRepositoryItem) item).commit(message);
+      }
+    }
+  }
 }

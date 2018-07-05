@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * Created by magnayn on 01/09/2016.
  */
-public class SimpleTest //extends TestCase
+public class SimpleTest extends TestCase
  {
 //  public void testOne() {
 //    XStream xs = new XStream(new StaxDriver());
@@ -95,6 +95,16 @@ public class SimpleTest //extends TestCase
     exec.destroy();
     state = exec.save();
     System.out.println(state);
+
+  }
+
+  public void testAWS() throws Exception {
+    SGExec exec = new SGExec(new File(getClass().getResource("/com/nirima/aws/aws1.sg").getFile()));
+
+    exec.apply();
+    String state = exec.save();
+    System.out.println(state);
+
 
   }
 

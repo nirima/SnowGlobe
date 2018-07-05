@@ -26,6 +26,17 @@ export class GlobeService {
       });
   }
 
+  async duplicate(id:string, newId:string):Promise<string> {
+    let url = `${this.getBaseURL()}/globe/${id}/duplicate/${newId}`;
+    console.log("duplicate " + url);
+
+    return this.http.post(url,"")
+      .map( (responseData) => {
+        console.log('Incoming' +responseData);
+        return responseData.text();
+      }).toPromise();
+  }
+
   async clone(id:string, newId:string):Promise<string> {
     let url = `${this.getBaseURL()}/globe/${id}/clone/${newId}`;
     console.log("clone " + url);
@@ -115,9 +126,36 @@ export class GlobeService {
     return this.http.put(url, "").toPromise();
   }
 
-  async newClone(id:string) {
-    let url = `${this.getBaseURL()}/globes/clone/${id}`;
-    return this.http.post(url, "").toPromise();
+  async newClone(curl:string) {
+    let url = `${this.getBaseURL()}/globes/clone`;
+
+    let cloneDetails: any = {
+      url: curl
+    };
+    return this.http.post(url, cloneDetails).toPromise();
+  }
+
+  async newCloneWithPassword(curl:string, username:string, password:string) {
+    let url = `${this.getBaseURL()}/globes/clone`;
+
+    if( username != null && username.length > 0 ) {
+
+      let cloneDetails: any = {
+        url: curl,
+        credentials: {
+          username: username,
+          password: password
+        }
+      };
+      return this.http.post(url, cloneDetails).toPromise();
+    }
+    else {
+      let cloneDetails: any = {
+        url: curl
+      };
+      return this.http.post(url, cloneDetails).toPromise();
+    }
+
   }
 
 

@@ -42,6 +42,25 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- All the modules -->
+        <dependency>
+            <groupId>com.nirima.snowglobe.modules</groupId>
+            <artifactId>snowglobe-module-aws</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.nirima.snowglobe.modules</groupId>
+            <artifactId>snowglobe-module-consul</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.nirima.snowglobe.modules</groupId>
+            <artifactId>snowglobe-module-docker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>

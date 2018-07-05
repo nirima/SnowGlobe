@@ -16,10 +16,7 @@ import com.nirima.snowglobe.core.*
 import com.nirima.snowglobe.plan.PlanAction
 import com.nirima.snowglobe.utils.ThreadLog
 import com.nirima.snowglobe.utils.ThreadLogBase
-import com.sun.jmx.snmp.IPAcl.Host
 import groovy.util.logging.Slf4j
-import org.apache.commons.lang.ObjectUtils
-import sun.nio.ch.Net
 
 /**
  * Created by magnayn on 04/09/2016.
@@ -100,6 +97,14 @@ class DockerContainerHost implements Comparable {
         return ComparatorUtils.fieldwiseCompare(this, o);
     }
 
+}
+
+class DockerContainerConstraints implements Comparable {
+    public String shm_size;
+
+    int compareTo(Object o) {
+        return ComparatorUtils.fieldwiseCompare(this, o);
+    }
 }
 
 /**
@@ -287,6 +292,8 @@ public class DockerContainerState extends ResourceState implements Comparable {
 
     public boolean tty = false;
 
+    public DockerContainerConstraints constraints;
+
     @NoCompare
     public String id;                          
 
@@ -323,6 +330,17 @@ public class DockerContainerState extends ResourceState implements Comparable {
 
         host << p;
     }
+
+    public void constraints(Closure c) {
+        DockerContainerConstraints p = new DockerContainerConstraints();
+        c.delegate = p;
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+
+        c()
+
+        constraints = p;
+    }
+
 
     @Override
     void accept(Object context) {

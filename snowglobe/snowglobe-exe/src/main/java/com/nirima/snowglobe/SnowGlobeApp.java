@@ -1,7 +1,5 @@
 package com.nirima.snowglobe;
 
-import com.nirima.snowglobe.core.Core;
-
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -9,8 +7,6 @@ import org.kohsuke.args4j.CmdLineParser;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by magnayn on 06/09/2016.

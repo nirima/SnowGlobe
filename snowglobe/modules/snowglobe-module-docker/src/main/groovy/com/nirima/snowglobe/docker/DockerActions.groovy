@@ -220,14 +220,27 @@ class DockerContainerAction extends PlanActionBase<DockerContainer, DockerContai
 
         CreateContainerCmd create = client.createContainerCmd(desiredState.image);
 
+        if( desiredState.constraints != null ) {
+            HostConfig hostConfig = new HostConfig();
+            hostConfig.withShmSize(Long.parseLong(desiredState.constraints.shm_size));
+            create.withHostConfig(hostConfig);
+        }
+
         create.withPublishAllPorts(desiredState.publish_all_ports);
+
+        final List<ExposedPort> exposedPortList = new ArrayList<>();
 
         Ports portBindings = new Ports();
         desiredState.ports.each {
-            portBindings.bind(ExposedPort.tcp(it.internal), Ports.Binding.bindPort(it.external));
+            ExposedPort xp = ExposedPort.tcp(it.internal);
+            portBindings.bind(xp, Ports.Binding.bindPort(it.external));
+            exposedPortList.add(xp);
 
         }
         create.withPortBindings(portBindings);
+        create.withExposedPorts(exposedPortList);
+
+
         if (desiredState.env != null) {
             create.withEnv(desiredState.env)
         };
@@ -319,6 +332,8 @@ class DockerContainerAction extends PlanActionBase<DockerContainer, DockerContai
 
             create.withCapAdd(caps);
         }
+
+
 
         create.withLabels(desiredState.labels);
 

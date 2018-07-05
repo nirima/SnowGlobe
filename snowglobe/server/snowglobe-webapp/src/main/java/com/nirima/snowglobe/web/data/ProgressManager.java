@@ -39,6 +39,9 @@ public class ProgressManager {
     Session session;
 
     public void sendString(String s) {
+      if( s == null )
+        return;
+
       if( session == null ) {
         log.debug("Not sending to empty session");
         return;

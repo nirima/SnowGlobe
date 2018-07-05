@@ -5,10 +5,60 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class ComparatorUtils {
 
-    static int fieldwiseCompare(Object a, Object b) {
+    static int compare(Object a, Object b)
+    {
+        // DO *NOT* call this from within the implementation of compareTo!!!
+        if( a == null && b == null )
+            return 0;
+        if (a == null && b != null)
+            return -1;
+        if (a != null && b == null)
+            return 1;
+
         if (a.is(b)) {
             return 0
         }
+        if( a.getClass().isPrimitive() ) {
+            if( a.equals(b) )
+                return 0;
+            else {
+                log.info("${a} to ${b}");
+                return -1;
+            }
+        }
+        if (Comparable.class.isAssignableFrom(a.getClass())) {
+            return a.compareTo(b);
+        }
+
+        if (a.getClass() != b.getClass()) {
+            return -1
+        }
+
+        return fieldwiseCompare(a,b);
+    }
+
+    static int fieldwiseCompare(Object a, Object b) {
+
+        if( a == null && b == null )
+            return 0;
+        if (a == null && b != null)
+            return -1;
+        if (a != null && b == null)
+            return 1;
+
+        if (a.is(b)) {
+            return 0
+        }
+
+        if( a.getClass().isPrimitive() ) {
+            if( a.equals(b) )
+                return 0;
+            else {
+                log.info("${a} to ${b}");
+                return -1;
+            }
+        }
+
 
         if (a.getClass() != b.getClass()) {
             return -1
@@ -30,10 +80,14 @@ class ComparatorUtils {
 
                 if( l == null && r == null)
                     return 0;
-                if( l == null && r != null )
+                if( l == null && r != null ) {
+                    log.info("[${it.name}] ${l} to ${r}");
                     return 1;
-                if( r == null && l != null )
+                }
+                if( r == null && l != null ) {
+                    log.info("[${it.name}] ${l} to ${r}");
                     return -1;
+                }
 
 
                 if (Comparable.class.isAssignableFrom(it.type)) {
@@ -51,11 +105,13 @@ class ComparatorUtils {
                 if( it.type.isPrimitive() ) {
                     if( l.equals(r) )
                         return 0;
-                    else
+                    else {
+                        log.info("[${it.name}] ${l} to ${r}");
                         return -1;
+                    }
                 }
 
-                log.error("don't know how to compare {}" ,it);
+                log.error("don't know how to compare field {} [examining {} and {}]" ,it.name, a,b);
 
                 return 0;
 
@@ -84,7 +140,7 @@ class ComparatorUtils {
             return a.size() - b.size();
 
         for(int i=0;i<a.size();i++) {
-            int v = fieldwiseCompare(a.get(i), b.get(i));
+            int v = compare(a.get(i), b.get(i));
             if( v != 0 )
                 return v;
         }

@@ -33,6 +33,8 @@ public class TopicLogger extends ThreadLogBase {
   @Override
   public void write(byte[] bytes) throws IOException {
     try {
+      if( this.rowId != null )
+        entry.sendString("[" + this.rowId.toString() + "]");
       entry.sendString(new String(bytes, "UTF-8"));  
     } catch(Exception ex)
     {

@@ -14,7 +14,7 @@ public interface IRepository {
    * @param id
    * @return
    */
-  IRepositoryModule forGlobe(String id);
+  IRepositoryItem forGlobe(String id);
 
   /**
    * Get a list of globes contained in this repository.

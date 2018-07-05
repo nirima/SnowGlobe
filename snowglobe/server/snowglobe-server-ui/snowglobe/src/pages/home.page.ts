@@ -39,6 +39,9 @@ import * as moment from 'moment';
                    background-color: red;
                  }
                 
+                 .type-git {
+                   border: 1px solid green;
+                 }
                  
                  mat-card {
                    margin-bottom: 10px;
@@ -65,9 +68,17 @@ import * as moment from 'moment';
                    <a mat-button class="docs-button docs-navbar-hide-small" (click)="cloneSnowglobe()"
                    >
 
-                     <mat-icon>library_add</mat-icon>
+                     <mat-icon>cloud_download</mat-icon>
 
                      Clone
+                   </a>
+
+                   <a mat-button class="docs-button docs-navbar-hide-small" (click)="duplicateSnowglobe()"
+                   >
+
+                     <mat-icon>file_copy</mat-icon>
+
+                     Duplicate
                    </a>
                    
 
@@ -147,6 +158,10 @@ export class HomePage {
     let t = [];
     g.tags.forEach(  gt => {t = t.concat(`tag-${gt}`)});
 
+    if( g.type != null ) {
+      t = t.concat(`type-${g.type}`);
+    }
+
     return t;
   }
 
@@ -180,13 +195,29 @@ export class HomePage {
   async cloneSnowglobe() {
 
     let dialogRef = this.dialog.open(DialogCloneSnowglobe, {
-      width: '250px',
+      width: '500px',
       data: {}
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed ' + result);
-      this.clone(result);
+      console.log('The dialog was closed ');
+      console.log(result);
+      this.clone(result.url, result.username, result.password);
+
+    });
+  }
+
+  async duplicateSnowglobe() {
+
+    let dialogRef = this.dialog.open(DialogDuplicateSnowglobe, {
+      width: '250px',
+      data: this.globes
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed ');
+      console.log(result);
+      this.duplicate(result.from, result.to);
     });
   }
 
@@ -195,8 +226,13 @@ export class HomePage {
     this.refresh();
   }
 
-  async clone(id) {
-    await this.globeService.newClone(id);
+  async clone(url, username, password) {
+    await this.globeService.newCloneWithPassword(url,username,password);
+    this.refresh();
+  }
+
+  async duplicate(from,to) {
+    await this.globeService.duplicate(from, to);
     this.refresh();
   }
 }
@@ -231,24 +267,98 @@ export class DialogNewSnowglobe {
 
 
 @Component({
-             selector: 'dialog-new-snowglobe',
-             template: `<h1 mat-dialog-title>Clone Snowglobe</h1>
-             <div mat-dialog-content>
-               <p>Clone from URL</p>
+             selector: 'dialog-clone-snowglobe',
+             template: `
+               <style>
+                 .dialog-content {
+                   display: flex;
+                   flex-direction: column;
+                 }
+
+                 .dialog-content > * {
+                   width: 100%;
+                 }
+               </style>
+               
+               <h1 mat-dialog-title>Clone Snowglobe</h1>
+             <div class="dialog-content" mat-dialog-content>
+               <p>Clone Snowglobe</p>
                <mat-form-field>
-                 <input matInput tabindex="1" [(ngModel)]="data.id">
+                 <input matInput placeholder="Name to use" tabindex="1" [(ngModel)]="name">
+               </mat-form-field>
+               <mat-form-field>
+                 <input matInput placeholder="URL to clone from" tabindex="2" [(ngModel)]="url">
+               </mat-form-field>
+               <mat-form-field>
+                 <input matInput placeholder="Username (if required)" tabindex="3" [(ngModel)]="username">
+               </mat-form-field>
+               <mat-form-field>
+                 <input type="password" matInput placeholder="Password (if required)" tabindex="4" [(ngModel)]="password">
                </mat-form-field>
              </div>
              <div mat-dialog-actions>
-               <button mat-button [mat-dialog-close]="data.id" tabindex="2">Ok</button>
+               <button mat-button [mat-dialog-close]="dialogData" tabindex="5">Ok</button>
                <button mat-button (click)="onNoClick()" tabindex="-1">Cancel</button>
              </div>
              `,
            })
 export class DialogCloneSnowglobe {
 
+  name:string;
+  url:string;
+  username:string;
+  password:string;
+
+  get dialogData():any {
+    return {url: this.url, name: this.name, username: this.username, password: this.password };
+  }
+
   constructor(
     public dialogRef: MatDialogRef<DialogCloneSnowglobe>,
+    @Inject(MAT_DIALOG_DATA) public data: any) { }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+}
+
+@Component({
+             selector: 'dialog-duplicate-snowglobe',
+             template: `<h1 mat-dialog-title>Duplicate Snowglobe</h1>
+             <div mat-dialog-content>
+               <p>Duplicate Snowglobe</p>
+               <mat-form-field>
+                 <mat-select placeholder="Existing Snowglobe" [(ngModel)]="oldName">
+                   <mat-option *ngFor="let globe of data" [value]="globe.id">
+                     {{ globe?.id }}
+                   </mat-option>
+                 </mat-select>
+               </mat-form-field>
+               <mat-form-field>
+                 <input matInput placeholder="New Name" tabindex="1" [(ngModel)]="newName">
+               </mat-form-field>
+             </div>
+             <div mat-dialog-actions>
+               <button mat-button [mat-dialog-close]="createData" tabindex="2">Ok</button>
+               <button mat-button (click)="onNoClick()" tabindex="-1">Cancel</button>
+             </div>
+             `,
+           })
+export class DialogDuplicateSnowglobe {
+
+  oldName:any;
+  newName:string;
+
+  get createData():any {
+    if( this.oldName == null || this.newName == null ) {
+      return null;
+    }
+    return {from:this.oldName, to:this.newName};
+  }
+
+  constructor(
+    public dialogRef: MatDialogRef<DialogDuplicateSnowglobe>,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   onNoClick(): void {

@@ -28,9 +28,9 @@ public class DockerRegistryChecker {
     }
 
     public boolean hasRemoteRepository() {
-      return this.name.split("/")[0].contains(".");
-    }
 
+      return this.name.contains("/") && this.name.split("/")[0].contains(".");
+    }
 
     String getImageName() {
       String n =  getImageId();

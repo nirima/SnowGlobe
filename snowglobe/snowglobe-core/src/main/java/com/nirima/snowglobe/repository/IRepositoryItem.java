@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * API for accessing a repository's module.
  */
-public interface IRepositoryModule {
+public interface IRepositoryItem {
   IRepository getRepository();
 
   void create() throws IOException;

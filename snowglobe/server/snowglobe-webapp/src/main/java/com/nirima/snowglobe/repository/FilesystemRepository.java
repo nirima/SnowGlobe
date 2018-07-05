@@ -1,42 +1,49 @@
 package com.nirima.snowglobe.repository;
 
+import com.google.common.base.Strings;
+
 import com.nirima.snowglobe.core.SnowGlobeSimpleReader;
 import com.nirima.snowglobe.core.SnowGlobeSystem;
+
 import com.nirima.snowglobe.web.data.Globe;
+import com.nirima.snowglobe.web.data.services.CredentialsManager;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FilesystemRepository implements IRepository {
   final File root;
+  private CredentialsManager credentialsManager;
 
-  public FilesystemRepository() {
-
+  public FilesystemRepository(CredentialsManager mgr) {
+    this.credentialsManager = mgr;
       File r = new File(System.getProperty("user.home"));
       this.root = new File(r, ".snowglobe");
     }
 
-  public FilesystemRepository(File root) {
+  public FilesystemRepository(CredentialsManager mgr, File root) {
+    this.credentialsManager = mgr;
     this.root = root;
   }
 
@@ -107,6 +114,12 @@ public class FilesystemRepository implements IRepository {
             }
           }
 
+          // Determine if we are backed to a repository
+          File fGit = new File(dir, ".git");
+          if( fGit.exists() ) {
+            g.type = "git";
+          }
+
 
           gg.add(g);
 
@@ -130,24 +143,85 @@ public class FilesystemRepository implements IRepository {
     return new File(getRepositoryRoot(), fullPath);
   }
 
-  public void cloneRepo(String uri) throws GitAPIException, URISyntaxException {
+  public void cloneRepo(String name, String uri, Credentials credentials) throws GitAPIException, URISyntaxException {
 
-    File location = getPathForUri(uri);
+    File location;
 
-    CredentialsProvider cp = new UsernamePasswordCredentialsProvider("magnayn", "");
+    if( Strings.isNullOrEmpty(name) )
+      location = getPathForUri(uri);
+    else {
+      location = new File(getRepositoryRoot(), name);
+      if( location.exists() )
+        throw RepositoryException.namedRepositoryAlreadyExists(name);
+    }
 
-    Git git = Git.cloneRepository()
-        .setCredentialsProvider(cp)
+
+    CloneCommand git = Git.cloneRepository()
         .setURI( uri )
-        .setDirectory( location )
-        .call();
+        .setDirectory( location );
+
+    if( credentials != null) {
+      CredentialsProvider cp = credentials.getCredentialsProvider();
+      git.setCredentialsProvider(cp);
+    }
+
+
+    git.call();
+
+    try {
+      storeCredentials(location, credentials);
+    } catch (IOException e) {
+      throw new RepositoryException("Could not save credentials", e);
+    }
 
   }
+
+  private void storeCredentials(File location, Credentials credentials)
+      throws IOException {
+    File credentialsFile = new File(location, ".repo");
+    Properties p = new Properties();
+    p.setProperty("username", credentials.getUsername());
+    String passwordCrypt = Secret.encrypt(credentials.getPassword(), key).toString();
+    p.setProperty("password", passwordCrypt);
+
+    FileOutputStream fos = new FileOutputStream(credentialsFile);
+    p.store(fos, "");
+    fos.close();
+  }
+
+  private Credentials loadCredentials(File location)
+      throws IOException {
+
+    File credentialsFile = new File(location, ".repo");
+    Properties p = new Properties();
+    FileInputStream fis = new FileInputStream(credentialsFile);
+
+    p.load(fis);
+    fis.close();
+
+    String passwordCrypt = p.getProperty("password");
+    String password = new String(Secret.fromCryptedString(passwordCrypt).decrypt(key));
+
+    return new Credentials(p.getProperty("username"), password);
+
+  }
+
+  // TODO: Per user decrypted by auth.
+  private static final Secret.SKey key = new Secret.SKey("N9WuZpF76AEUzTmwiJO98A==");
 
   @Override
-  public IRepositoryModule forGlobe(String id) {
-    return new GlobeProcessor(this, id.replace(":","/"));
+  public IRepositoryItem forGlobe(String id) {
+    return new RepositoryItem(this, id.replace(":", "/"));
   }
 
 
+
+  public CredentialsManager getCredentialsManager() {
+    return credentialsManager;
+  }
+
+  public void setCredentialsManager(
+      CredentialsManager credentialsManager) {
+    this.credentialsManager = credentialsManager;
+  }
 }

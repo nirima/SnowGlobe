@@ -3,15 +3,21 @@ package com.nirima.snowglobe.repository;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 import com.nirima.snowglobe.SGExec;
 import com.nirima.snowglobe.SGParameters;
 import com.nirima.snowglobe.SGTags;
 import com.nirima.snowglobe.web.data.Globe;
+import com.nirima.snowglobe.web.data.services.CredentialsManager;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidConfigurationException;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.PushResult;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.javers.common.collections.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,20 +25,23 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class GlobeProcessor implements IRepositoryModule {
+/**
+ * Represents an item in the SnowGlobe repository.
+ */
+public class RepositoryItem implements IRepositoryItem, ITransactionalRepositoryItem {
 
-  private static final Logger log = LoggerFactory.getLogger(GlobeProcessor.class);
+  private static final Logger log = LoggerFactory.getLogger(RepositoryItem.class);
 
   final String id;
   final FilesystemRepository repo;
 
-  public GlobeProcessor(FilesystemRepository repo, String id) {
+  public RepositoryItem(FilesystemRepository repo, String id) {
     this.id = id;
     this.repo = repo;
   }
@@ -48,18 +57,20 @@ public class GlobeProcessor implements IRepositoryModule {
   public Globe details() {
     Globe globe = new Globe();
     globe.id = id;
-    for(File f : rootDir().listFiles()) {
-      if( f.getName().endsWith(".sg") ) {
+    for (File f : rootDir().listFiles()) {
+      if (f.getName().endsWith(".sg")) {
         globe.configFiles.add(f.getName());
       }
     }
 
-    if( new File(rootDir(), ".git").exists() )
+    if (new File(rootDir(), ".git").exists()) {
       globe.type = "git";
+    }
 
     File f = new File(getRepositoryRoot(), id + "/snowglobe.sgstate");
-    if( f.exists() )
+    if (f.exists()) {
       globe.lastUpdate = new Date(f.lastModified());
+    }
 
     return globe;
   }
@@ -68,8 +79,9 @@ public class GlobeProcessor implements IRepositoryModule {
   public String getVariables() throws IOException {
 
     File f = new File(getRepositoryRoot(), id + "/snowglobe.vars");
-    if( !f.exists() )
+    if (!f.exists()) {
       return "";
+    }
 
     return Files.toString(f, Charsets.UTF_8);
 
@@ -85,12 +97,14 @@ public class GlobeProcessor implements IRepositoryModule {
   public Set<String> getTags() {
     File f = new File(getRepositoryRoot(), id + "/snowglobe.tags");
     try {
-      List<String> lines = FileUtils.readLines(f, "UTF-8");
-      return Sets.asSet(lines);
+      if( f.exists() ) {
+        List<String> lines = FileUtils.readLines(f, "UTF-8");
+        return Sets.asSet(lines);
+      }
     } catch (Exception e) {
       log.error("Error reading tags", e);
     }
-    return new HashSet<String>();
+    return new HashSet<>();
   }
 
   @Override
@@ -117,8 +131,9 @@ public class GlobeProcessor implements IRepositoryModule {
 
   public String getState() throws IOException {
     File f = new File(getRepositoryRoot(), id + "/snowglobe.sgstate");
-    if( !f.exists() )
+    if (!f.exists()) {
       return "";
+    }
     return Files.toString(f, Charsets.UTF_8);
   }
 
@@ -128,18 +143,21 @@ public class GlobeProcessor implements IRepositoryModule {
   }
 
   public String getConfig(String name) throws IOException {
-    if(Strings.isNullOrEmpty(name))
+    if (Strings.isNullOrEmpty(name)) {
       name = "snowglobe.sg";
+    }
 
     File f = new File(rootDir(), name);
-    if( !f.exists() )
+    if (!f.exists()) {
       return "";
+    }
     return Files.toString(f, Charsets.UTF_8);
   }
 
   public void setConfig(String name, String data) throws IOException {
-    if(Strings.isNullOrEmpty(name))
+    if (Strings.isNullOrEmpty(name)) {
       name = "snowglobe.sg";
+    }
 
     File f = new File(rootDir(), name);
     Files.write(data.getBytes(), f);
@@ -159,11 +177,10 @@ public class GlobeProcessor implements IRepositoryModule {
           sgExec =
           new SGExec(new File(getRepositoryRoot(), id + "/snowglobe.sg"),
                      new File(
-                         getRepositoryRoot(), id + "/snowglobe.sgstate"),  getSGParameters());
+                         getRepositoryRoot(), id + "/snowglobe.sgstate"), getSGParameters());
 
       return sgExec;
-    }
-    catch(Exception ex) {
+    } catch (Exception ex) {
       ex.printStackTrace();
       throw Throwables.propagate(ex);
     }
@@ -171,8 +188,87 @@ public class GlobeProcessor implements IRepositoryModule {
 
   public void delete() throws IOException {
     File path = new File(getRepositoryRoot(), id);
-    
+
     FileUtils.deleteDirectory(path);
+  }
+
+  @Override
+  public void begin() {
+    // Update from repo
+    Git git = null;
+    try {
+      
+      git = openGit();
+      if( git == null )
+        return;
+
+      git.pull().call();
+    }
+    catch(InvalidConfigurationException e) {
+      // Fine
+    }
+    catch (Exception ex) {
+      //throw new RepositoryException("Error", ex);
+      // Probably not found
+    }
+
+  }
+
+  @Override
+  public void commit(String message) {
+    try {
+
+      CredentialsManager mgr = repo.getCredentialsManager();
+
+      Git git = openGit();
+      if( git == null )
+        return;
+
+
+      // Add any files.
+      git.add().addFilepattern(".").call();
+
+      git.commit().setMessage(message)
+          .setCommitter("SnowGlobe User", "snowglobe@nirima.com")
+          .setAuthor("SnowGlobe User", "snowglobe@nirima.com")
+          .setAllowEmpty(true)
+          .call();
+
+
+      if( git.remoteList().call().size() > 0 ) {
+        Credentials c = mgr.getCredentialsForLocation(new URL("http://github.com"));
+
+        CredentialsProvider cp = new UsernamePasswordCredentialsProvider(c.getUsername(), c.getPassword());
+
+        Iterable<PushResult> results = git.push().setCredentialsProvider(cp).call();
+
+        results.forEach( pr -> log.info(pr.getMessages() ));
+      }
+
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      //throw new RepositoryException("Error", ex);
+    }
+  }
+
+  private Git openGit() {
+
+    File directory = rootDir();
+
+    while( !directory.equals(getRepositoryRoot())) {
+      // Use .gitmask to mask the entire directory
+      if (new File(directory, ".gitmask").exists())
+        return null;
+
+      try {
+        Git g = Git.open(directory);
+        return g;
+      } catch(Exception ex) {
+
+      }
+      directory = directory.getParentFile();
+    }
+    return null;
   }
 
 

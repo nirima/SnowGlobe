@@ -1,0 +1,16 @@
+
+snowglobe
+{
+    module("base") {
+
+       aws_instance("frontman") {
+            ami = "ami-5daa463a";
+            instance_type = "t2.micro";
+
+            providers << file {
+                 source = "foo.sh"
+                 dest   = "/home/bar.sh"
+            }
+       }
+    }
+}

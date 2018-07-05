@@ -7,7 +7,12 @@ import { AppComponent } from './app.component';
 import {GlobeService} from "../services/globe.service";
 import {AppConfig} from "../services/appConfig";
 import {RouterModule} from "@angular/router";
-import {DialogCloneSnowglobe, DialogNewSnowglobe, HomePage} from "../pages/home.page";
+import {
+  DialogCloneSnowglobe,
+  DialogDuplicateSnowglobe,
+  DialogNewSnowglobe,
+  HomePage
+} from "../pages/home.page";
 import {ConnectionPage} from "../pages/connection.page";
 
 import {EnvironmentPage} from "../pages/environment.page";
@@ -34,7 +39,7 @@ import {DialogDelete, DialogTags} from "../pages/globe.page";
 @NgModule({
   declarations: [
     AppComponent, HomePage, EnvironmentPage, ConnectionPage, GlobePage,
-    DialogNewSnowglobe, DialogApply,DialogValidate, DialogDestroy, DialogDelete, DialogTags, DialogCloneSnowglobe
+    DialogNewSnowglobe, DialogApply,DialogValidate, DialogDestroy, DialogDelete, DialogTags, DialogCloneSnowglobe, DialogDuplicateSnowglobe
   ],
   imports: [
     BrowserModule,
@@ -89,6 +94,6 @@ import {DialogDelete, DialogTags} from "../pages/globe.page";
   ],
   providers: [GlobeService, ProgressService, AppConfig, WindowRefService, {provide: MAT_PLACEHOLDER_GLOBAL_OPTIONS, useValue: {float: 'always'}}],
   bootstrap: [AppComponent],
-  entryComponents: [DialogNewSnowglobe, DialogApply, DialogTags, DialogValidate, DialogDestroy, DialogDelete, DialogCloneSnowglobe]
+  entryComponents: [DialogNewSnowglobe, DialogApply, DialogTags, DialogValidate, DialogDestroy, DialogDelete, DialogCloneSnowglobe, DialogDuplicateSnowglobe]
 })
 export class AppModule { }

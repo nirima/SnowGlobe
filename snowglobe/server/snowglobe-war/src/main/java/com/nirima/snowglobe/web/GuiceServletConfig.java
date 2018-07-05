@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.nirima.snowglobe.environment.SnowglobeEnvironment;
 import com.nirima.snowglobe.web.data.ProgressManager;
+import com.nirima.snowglobe.web.data.services.CredentialsManager;
 import com.nirima.snowglobe.web.data.services.GlobeManager;
 import com.nirima.snowglobe.web.data.services.SinatraManager;
 import com.nirima.snowglobe.web.guacamole.TunnelServlet;
@@ -169,6 +170,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
             bind(ProgressManager.class).asEagerSingleton();
             bind(SinatraManager.class).asEagerSingleton();
             bind(GlobeManager.class).asEagerSingleton();
+            bind(CredentialsManager.class).asEagerSingleton();
 
             bind(TunnelServlet.class).asEagerSingleton();
               serve("/tunnel/*").with(TunnelServlet.class);

@@ -10,8 +10,8 @@ public class FilesystemRepositoryTest {
 
   @Test
   public void testCloneRepo() throws Exception {
-    FilesystemRepository repo = new FilesystemRepository(new File("/tmp/fry"));
+    FilesystemRepository repo = new FilesystemRepository(null, new File("/tmp/fry"));
    // repo.cloneRepo("https://github.com/nirima/snowglobe-test-lib1");
-    repo.cloneRepo("https://github.com/AllocateSoftware/support");
+    //repo.cloneRepo("https://github.com/AllocateSoftware/support", new C);
   }
 }

@@ -9,7 +9,7 @@ import com.nirima.snowglobe.graph.GraphBuilder
 import com.nirima.snowglobe.plan.Plan
 import com.nirima.snowglobe.plan.PlanBuilder
 import com.nirima.snowglobe.plan.PlanType
-import com.nirima.snowglobe.repository.IRepositoryModule
+import com.nirima.snowglobe.repository.IRepositoryItem
 import org.codehaus.groovy.runtime.InvokerHelper
 
 import java.lang.reflect.Field
@@ -40,22 +40,26 @@ public class SGParameters {
         return System.getProperty(name);
     }
 
+    def propertyMissing(String name, value) { _itemMap[name] = value }
+
 
     def load(InputStream inputStream) {
 
         data = new Toml().read(inputStream)
         this._itemMap = data.toMap();
     }
+
+    
 }
 
 /**
  * Access to the tags
  */
 public class SGTags {
-    private final IRepositoryModule globeProcessor;
+    private final IRepositoryItem globeProcessor;
     Set<String> tags;
 
-    SGTags(IRepositoryModule globeProcessor) {
+    SGTags(IRepositoryItem globeProcessor) {
         this.globeProcessor = globeProcessor;
         this.tags = globeProcessor.getTags();
     }
@@ -432,6 +436,12 @@ public class SGWriter {
     public String getValue(Object o) {
         if( o instanceof String || o instanceof GString) {
             // TODO : quoted string
+
+            String theString = o.toString();
+            // Multi-line, then use delims.
+            if( theString.contains("\n") )
+                return "\"\"\"" + theString + "\"\"\"";
+
 
             String qs = o.replace("\\", "\\\\")
                     .replace("\$", "\\\$")

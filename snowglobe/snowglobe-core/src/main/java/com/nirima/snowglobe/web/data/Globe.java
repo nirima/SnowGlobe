@@ -10,7 +10,15 @@ import java.util.Objects;
  * Created by magnayn on 26/04/2017.
  */
 public class Globe implements Serializable {
+
+    /**
+     * ID for specifying this.
+     */
     public String id;
+
+    /**
+     * Is this git-backed repo?
+     */
     public String type;
 
     public String name;

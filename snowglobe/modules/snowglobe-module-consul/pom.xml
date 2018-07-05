@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>com.nirima.snowglobe</groupId>
+        <artifactId>server</artifactId>
+        <version>0.0.1</version>
+    </parent>
+
+    <groupId>com.nirima.snowglobe.modules</groupId>
+    <artifactId>snowglobe-module-consul</artifactId>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+
+        </dependency>
+        <dependency>
+            <groupId>com.orbitz.consul</groupId>
+            <artifactId>consul-client</artifactId>
+            <version>0.12.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.nirima.snowglobe</groupId>
+            <artifactId>snowglobe-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenVersion}</version>
+                <executions>
+                    <execution>
+                        <!--<goals>-->
+                        <!--<goal>addSources</goal>-->
+                        <!--<goal>addTestSources</goal>-->
+                        <!--&lt;!&ndash;<goal>generateStubs</goal>&ndash;&gt;-->
+                        <!--<goal>compile</goal>-->
+                        <!--&lt;!&ndash;<goal>testGenerateStubs</goal>&ndash;&gt;-->
+                        <!--<goal>testCompile</goal>-->
+                        <!--&lt;!&ndash;<goal>removeStubs</goal>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<goal>removeTestStubs</goal>&ndash;&gt;-->
+                        <!--</goals>-->
+                        <goals>
+                            <goal>addSources</goal>
+                            <goal>addTestSources</goal>
+                            <goal>generateStubs</goal>
+                            <goal>compile</goal>
+                            <goal>generateTestStubs</goal>
+                            <goal>compileTests</goal>
+                            <goal>removeStubs</goal>
+                            <goal>removeTestStubs</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-all</artifactId>
+                        <!-- any version of Groovy \>= 1.5.0 should work here -->
+                        <version>${groovy.version}</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

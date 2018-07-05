@@ -3,10 +3,9 @@ package com.nirima.snowglobe.core
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.nirima.snowglobe.docker.DockerContainerState
 import com.nirima.snowglobe.plan.PlanAction
 import com.nirima.snowglobe.repository.IRepository
-import com.nirima.snowglobe.repository.IRepositoryModule
+import com.nirima.snowglobe.repository.IRepositoryItem
 import groovy.util.logging.Slf4j
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.reflections.Reflections
@@ -290,7 +289,7 @@ public class SnowGlobe {
     public Script loadModule(String uri) {
         IRepository repo;
 
-        IRepositoryModule module = repo.getModule(uri);
+        IRepositoryItem module = repo.getModule(uri);
 
         String scriptData = module.getConfig(null);
 
@@ -504,6 +503,10 @@ public class ResourceState extends State {
     @JsonIgnore
     public Object provider;
 
+    @JsonIgnore
+    public List<Provisioner> provisioners = [];
+
+
     ResourceState(Resource parent, Closure closure) {
         super(closure);
     }
@@ -641,6 +644,17 @@ public class Provider {
     public String toString() {
         return "provider(${getClass()}):${id}"
     }
+}
+
+/**
+ * Provisioner - scriptlets that get called after a resource is
+ * created.
+ *
+ * TODO: I'm not sure this is the abstraction - we could simply layer
+ * a provider and a module 'on top of' the underlying fabric.
+ */
+abstract class Provisioner {
+    abstract void run(Resource resource);
 }
 
 public abstract class DataSource<T extends DataSourceState> extends Provider {
