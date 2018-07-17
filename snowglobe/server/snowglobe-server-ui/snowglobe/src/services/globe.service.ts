@@ -126,6 +126,12 @@ export class GlobeService {
     return this.http.put(url, "").toPromise();
   }
 
+  async updateAll() {
+    let url = `${this.getBaseURL()}/globes/update`;
+    return this.http.get(url)
+      .toPromise();
+  }
+
   async newClone(curl:string) {
     let url = `${this.getBaseURL()}/globes/clone`;
 

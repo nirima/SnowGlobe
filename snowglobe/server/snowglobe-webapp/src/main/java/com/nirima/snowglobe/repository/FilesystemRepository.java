@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 
 import com.nirima.snowglobe.core.SnowGlobeSimpleReader;
 import com.nirima.snowglobe.core.SnowGlobeSystem;
-
 import com.nirima.snowglobe.web.data.Globe;
 import com.nirima.snowglobe.web.data.services.CredentialsManager;
 
@@ -13,7 +12,6 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -102,14 +100,14 @@ public class FilesystemRepository implements IRepository {
               SnowGlobeSimpleReader sgr = snowGlobeSystem.parseStateOnly(new FileInputStream(f));
 
               if( sgr == null || sgr.getResourceCount() == 0 ) {
-                g.tags.add("_empty");
+                g.traits.add("empty");
               }
 
             } catch (Exception e) {
               if(e instanceof FileNotFoundException) {
                 // this one is OK
               } else {
-                g.tags.add("_state_error");
+                g.traits.add("_state_error");
               }
             }
           }
@@ -117,7 +115,7 @@ public class FilesystemRepository implements IRepository {
           // Determine if we are backed to a repository
           File fGit = new File(dir, ".git");
           if( fGit.exists() ) {
-            g.type = "git";
+            g.traits.add( "git");
           }
 
 
@@ -223,5 +221,16 @@ public class FilesystemRepository implements IRepository {
   public void setCredentialsManager(
       CredentialsManager credentialsManager) {
     this.credentialsManager = credentialsManager;
+  }
+
+  public void updateAll() {
+    // Call update on all tranactional repo items.
+    this.list().forEach(
+        it -> {
+          IRepositoryItem ri = forGlobe(it.id);
+          if (ri instanceof ITransactionalRepositoryItem) {
+            ((ITransactionalRepositoryItem) ri).update();
+          }
+        });
   }
 }

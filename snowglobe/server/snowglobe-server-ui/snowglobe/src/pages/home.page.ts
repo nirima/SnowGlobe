@@ -31,15 +31,15 @@ import * as moment from 'moment';
                  
                 
                  
-                 .tag-_empty {
+                 .trait-empty {
                      background-color: darkgrey;
                    }
                  
-                 .tag-_state_error {
+                 .trait-state_error {
                    background-color: red;
                  }
                 
-                 .type-git {
+                 .trait-git {
                    border: 1px solid green;
                  }
                  
@@ -80,8 +80,15 @@ import * as moment from 'moment';
 
                      Duplicate
                    </a>
-                   
 
+                   <a mat-button class="docs-button docs-navbar-hide-small" (click)="updateAll()"
+                   >
+
+                     <mat-icon>system_update</mat-icon>
+
+                     Update All
+                   </a>
+                   
                  </mat-toolbar-row>
                </mat-toolbar>
 <div class="home-list">
@@ -156,11 +163,9 @@ export class HomePage {
 
   tagClasses(g):Array<string> {
     let t = [];
-    g.tags.forEach(  gt => {t = t.concat(`tag-${gt}`)});
+    g.traits.forEach(  gt => {t = t.concat(`trait-${gt}`)});
 
-    if( g.type != null ) {
-      t = t.concat(`type-${g.type}`);
-    }
+
 
     return t;
   }
@@ -219,6 +224,11 @@ export class HomePage {
       console.log(result);
       this.duplicate(result.from, result.to);
     });
+  }
+
+  async updateAll() {
+    await this.globeService.updateAll();
+    this.refresh();
   }
 
   async create(id) {

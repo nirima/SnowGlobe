@@ -50,4 +50,8 @@ public class GlobeManager {
   public void clone(String name, String url, Credentials credentials) throws GitAPIException, URISyntaxException {
     getRepository().cloneRepo(name, url, credentials);
   }
+
+  public void updateAll() {
+    getRepository().updateAll();
+  }
 }

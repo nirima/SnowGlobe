@@ -64,7 +64,7 @@ public class RepositoryItem implements IRepositoryItem, ITransactionalRepository
     }
 
     if (new File(rootDir(), ".git").exists()) {
-      globe.type = "git";
+      globe.traits.add("git");
     }
 
     File f = new File(getRepositoryRoot(), id + "/snowglobe.sgstate");
@@ -193,11 +193,11 @@ public class RepositoryItem implements IRepositoryItem, ITransactionalRepository
   }
 
   @Override
-  public void begin() {
+  public void update() {
     // Update from repo
     Git git = null;
     try {
-      
+
       git = openGit();
       if( git == null )
         return;
@@ -211,6 +211,13 @@ public class RepositoryItem implements IRepositoryItem, ITransactionalRepository
       //throw new RepositoryException("Error", ex);
       // Probably not found
     }
+
+  }
+
+  @Override
+  public void begin() {
+    // Update from repo
+    update();
 
   }
 

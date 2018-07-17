@@ -16,11 +16,6 @@ public class Globe implements Serializable {
      */
     public String id;
 
-    /**
-     * Is this git-backed repo?
-     */
-    public String type;
-
     public String name;
     public String description;
 
@@ -28,6 +23,9 @@ public class Globe implements Serializable {
     public Date created;
 
     public List<String> tags = new ArrayList<>();
+
+    // Traits - e.g: empty, docker, git
+    public List<String> traits = new ArrayList<>();
 
     public List<String> configFiles = new ArrayList<>();
 

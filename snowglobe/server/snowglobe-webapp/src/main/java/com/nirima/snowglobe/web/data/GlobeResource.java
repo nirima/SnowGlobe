@@ -85,6 +85,14 @@ public class GlobeResource {
     return globeManager.list();
   }
 
+  @Path("/globes/update")
+  @GET
+  @Produces("application/json")
+  public String updateGlobes() {
+    globeManager.updateAll();
+    return "OK";
+  }
+
   @Path("/globe/{id}")
   @GET
   @Produces("application/json")
