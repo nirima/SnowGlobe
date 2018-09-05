@@ -28,6 +28,10 @@ class ConsulProvider extends Provider {
                 .withHostAndPort(HostAndPort.fromString(address))
                 .build();
 
+
+        // Try this to check
+        consul.statusClient().getLeader();
+
         return consul;
     }
 }

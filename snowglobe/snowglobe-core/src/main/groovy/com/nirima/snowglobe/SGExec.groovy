@@ -42,6 +42,27 @@ public class SGParameters {
 
     def propertyMissing(String name, value) { _itemMap[name] = value }
 
+    def set(String name, value) {
+
+        _set(_itemMap, name, value);
+    }
+
+    private static _set(Map itemMap, String name, value) {
+        if(!name.contains(".") ) {
+            itemMap[name] = value;
+
+        } else {
+            def idx = name.indexOf('.');
+            String thisName = name.substring(0,idx);
+            String nextName = name.substring(idx+1);
+            if(!itemMap.containsKey(thisName)) {
+                itemMap[thisName] = new HashMap();
+            }
+            _set((Map)itemMap[thisName],nextName,value);
+        }
+
+
+    }
 
     def load(InputStream inputStream) {
 
@@ -49,7 +70,27 @@ public class SGParameters {
         this._itemMap = data.toMap();
     }
 
-    
+
+    @Override
+    public String toString() {
+        String r = "[SGParameters]\n";
+        r = r + _toString(_itemMap,"");
+        return r;
+    }
+
+    private String _toString(Map m, String indent) {
+        String r = "";
+        for(String k : m.keySet()) {
+            r = r + indent + k + "\t";
+            if( m[k] instanceof Map ) {
+                r = r + "\n"
+                r = r + _toString((Map)m[k], indent + "\t");
+            } else {
+                r = r + m[k] + "\n";
+            }
+        }
+        return r;
+    }
 }
 
 /**

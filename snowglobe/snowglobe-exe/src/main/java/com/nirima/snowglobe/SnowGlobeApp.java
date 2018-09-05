@@ -17,9 +17,7 @@ public class SnowGlobeApp {
   Action action;
 
 
-
   public static void main(String[] args) throws IOException {
-
 
     new SnowGlobeApp().doMain(args);
   }
@@ -40,10 +38,10 @@ public class SnowGlobeApp {
 
       // after parsing arguments, you should check
       // if enough arguments are given.
-  //    if( arguments.isEmpty() )
-    //    throw new CmdLineException(parser, "No argument is given");
+      //    if( arguments.isEmpty() )
+      //    throw new CmdLineException(parser, "No argument is given");
 
-    } catch( CmdLineException e ) {
+    } catch (CmdLineException e) {
       // if there's a problem in the command line,
       // you'll get this exception. this will report
       // an error message.
@@ -53,11 +51,8 @@ public class SnowGlobeApp {
       parser.printUsage(System.err);
       System.err.println();
 
-
       return;
     }
-
-
 
     // access non-option arguments
     System.err.println("other arguments are:");
@@ -66,32 +61,30 @@ public class SnowGlobeApp {
     File f1 = new File("snowglobe.sg");
     File f2 = new File("snowglobe.sgstate");
 
-    SGExec exec = new SGExec(f1,f2);
+    SGExec exec = new SGExec(f1, f2);
 
+    switch (action) {
+      case list:
+        
 
-    switch(action) {
       case graph:
         exec.graph(System.out);
         break;
-      case apply:
-      {
+      case apply: {
         try {
           exec.apply();
         } finally {
-          try(FileOutputStream fos = new FileOutputStream(f2))
-          {
+          try (FileOutputStream fos = new FileOutputStream(f2)) {
             fos.write(exec.save().getBytes());
           }
         }
       }
       break;
-      case destroy:
-      {
+      case destroy: {
         try {
           exec.destroy();
         } finally {
-          try(FileOutputStream fos = new FileOutputStream(f2))
-          {
+          try (FileOutputStream fos = new FileOutputStream(f2)) {
             fos.write(exec.save().getBytes());
           }
         }

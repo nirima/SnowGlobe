@@ -242,7 +242,8 @@ class DockerContainerAction extends PlanActionBase<DockerContainer, DockerContai
 
 
         if (desiredState.env != null) {
-            create.withEnv(desiredState.env)
+            List<String> theEnv = desiredState.env.collect() { it.toString(); }
+            create.withEnv(theEnv);
         };
 
         if (desiredState.command != null) {
